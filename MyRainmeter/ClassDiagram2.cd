@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CClassViewMenuButton" Collapsed="true">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAABAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ClassView.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CKitViewMenuButton" Collapsed="true">
+    <Position X="7.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>KitView.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAboutDlg" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAABAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyRainmeter.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CChildFrame" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAACAAAgAAAgAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>ChildFrm.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CClassToolBar" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>ClassView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CClassView" Collapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACACABAgAEAAAwAhAAMgAAAAiAEgAEAAAEBgEAAACA=</HashCode>
+      <FileName>ClassView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CFileViewToolBar" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>FileView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CFileView" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACgCAAAiAEAACABAAAAkAAAACAAAEFQgQABCABIAAA=</HashCode>
+      <FileName>FileView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CKitToolBar" Collapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>KitView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CKitView" Collapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACASABAghEAAAgAhAAIgAAAIiAAgAEAAAABAEBAACA=</HashCode>
+      <FileName>KitView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMainFrame" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAgCAAAAgIAAASAGAACiAAEoCEAAgAgAABQAAAAAhA=</HashCode>
+      <FileName>MainFrm.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMeter" Collapsed="true">
+    <Position X="2.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>Meter.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMouse" Collapsed="true">
+    <Position X="4" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Mouse.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMyRainmeterApp" Collapsed="true">
+    <Position X="5.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAAAABQAAAAAQCAAARMAACABA=</HashCode>
+      <FileName>MyRainmeter.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMyRainmeterDoc" Collapsed="true">
+    <Position X="7.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACIAIgAAgASggAAAAAAABAAAAAAA=</HashCode>
+      <FileName>MyRainmeterDoc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMyRainmeterTextView" Collapsed="true">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAGABAkAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyRainmeterTextView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMyRainmeterView" Collapsed="true">
+    <Position X="2.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAEBAAAAAGAJAgABAgAAAAAAAAAgJAAAIAQA=</HashCode>
+      <FileName>MyRainmeterView.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COutputList" Collapsed="true">
+    <Position X="4" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAABAAAAgAAAAAAAAAAAIAABAAAIAAA=</HashCode>
+      <FileName>OutputWnd.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COutputWnd" Collapsed="true">
+    <Position X="5.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QBIAACAAAAECAAAAAAAAAAAAACACAAAABAABIAAECAA=</HashCode>
+      <FileName>OutputWnd.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPropertiesToolBar" Collapsed="true">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>PropertiesWnd.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPropertiesWnd" Collapsed="true">
+    <Position X="0.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAFkAAQCAAAQAmAAAACAAAAUAAJAACBQAAAA=</HashCode>
+      <FileName>PropertiesWnd.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CViewTree" Collapsed="true">
+    <Position X="2.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAgQAAAAA=</HashCode>
+      <FileName>ViewTree.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="微软雅黑" Size="9" />
+</ClassDiagram>
