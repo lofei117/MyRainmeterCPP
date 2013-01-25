@@ -6,6 +6,7 @@
 #include "MyRainmeter.h"
 
 #include "MainFrm.h"
+#include <cstringt.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -442,4 +443,9 @@ void CMainFrame::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 {
 	CMDIFrameWndEx::OnSettingChange(uFlags, lpszSection);
 	m_wndOutput.UpdateFonts();
+}
+
+void CMainFrame::AddStrLogToOutputWnd( CString str )
+{
+	m_wndOutput.AddOutput(str);	
 }

@@ -13,6 +13,8 @@
 #include "MyRainmeterView.h"
 #include "MyRainmeterTextView.h"
 
+#include "ConfigParser.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -31,6 +33,7 @@ BEGIN_MESSAGE_MAP(CMyRainmeterApp, CWinAppEx)
 	ON_COMMAND(ID_FILE_NEW_CONFIG, &CMyRainmeterApp::OnFileNewConfig)
 	//新建皮肤
 	ON_COMMAND(ID_FILE_NEW_SKIN, &CMyRainmeterApp::OnFileNewSkin)
+	ON_COMMAND(ID_FILE_NEW, &CMyRainmeterApp::OnFileNew)
 END_MESSAGE_MAP()
 
 
@@ -124,13 +127,13 @@ BOOL CMyRainmeterApp::InitInstance()
 	if (!pDocTemplate)
 		return FALSE;
 	AddDocTemplate(pDocTemplate);
-	//pDocTemplate = new CMultiDocTemplate(IDR_MyRainmeterTYPE,
-	//	RUNTIME_CLASS(CMyRainmeterDoc),
-	//	RUNTIME_CLASS(CChildFrame), // 自定义 MDI 子框架
-	//	RUNTIME_CLASS(CMyRainmeterTextView));
-	//if (!pDocTemplate)
-	//	return FALSE;
-	//AddDocTemplate(pDocTemplate);
+	pDocTemplate = new CMultiDocTemplate(IDR_MyRainmeterTYPE,
+		RUNTIME_CLASS(CMyRainmeterDoc),
+		RUNTIME_CLASS(CChildFrame), // 自定义 MDI 子框架
+		RUNTIME_CLASS(CMyRainmeterTextView));
+	if (!pDocTemplate)
+		return FALSE;
+	AddDocTemplate(pDocTemplate);
 
 	// 创建主 MDI 框架窗口
 	CMainFrame* pMainFrame = new CMainFrame;
@@ -146,8 +149,12 @@ BOOL CMyRainmeterApp::InitInstance()
 	EnableShellOpen();
 	RegisterShellFileTypes(TRUE);
 
+
 	// 分析标准 shell 命令、DDE、打开文件操作的命令行
 	CCommandLineInfo cmdInfo;
+	cmdInfo.m_nShellCommand = CCommandLineInfo::FileNothing;
+	// Dispatch commands specified on the command line
+	
 	ParseCommandLine(cmdInfo);
 
 
@@ -242,6 +249,7 @@ void CMyRainmeterApp::SaveCustomState()
 void CMyRainmeterApp::OnFileNewConfig()
 {
 	// TODO: 在此添加命令处理程序代码
+
 	CWinAppEx::OnFileNew();
 }
 
@@ -250,4 +258,23 @@ void CMyRainmeterApp::OnFileNewSkin()
 {
 	// TODO: 在此添加命令处理程序代码
 	MessageBox(NULL, _T("fff"), _T("aaa"), 0);
+	
+}
+
+
+void CMyRainmeterApp::OnFileNew()
+{
+	// TODO: 在此添加命令处理程序代码
+	MessageBox(NULL, _T("test"), _T("aaa"), 0);
+	//for(POSITION tPos = theApp.m_pDocManager->GetFirstDocTemplatePosition();tPos!=NULL;)
+	//{
+	//	//get pointer to the CdocTemplates.
+	//	CDocTemplate * ptempDocTemplate = 
+	//		theApp.m_pDocManager->GetNextDocTemplate (tPos);
+	//	//this will make the view visible.
+	//	ptempDocTemplate->OpenDocumentFile(NULL);
+	//}
+	POSITION tFirstDocTemplatePos = theApp.m_pDocManager->GetFirstDocTemplatePosition();
+	CDocTemplate* pBitmapViewDocTemplate = theApp.m_pDocManager->GetNextDocTemplate(tFirstDocTemplatePos);
+	pBitmapViewDocTemplate->OpenDocumentFile(NULL);
 }

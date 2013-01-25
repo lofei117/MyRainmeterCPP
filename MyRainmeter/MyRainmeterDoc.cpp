@@ -10,6 +10,7 @@
 #endif
 
 #include "MyRainmeterDoc.h"
+#include "MainFrm.h"
 
 #include <propkey.h>
 
@@ -30,6 +31,11 @@ END_MESSAGE_MAP()
 CMyRainmeterDoc::CMyRainmeterDoc()
 {
 	// TODO: 在此添加一次性构造代码
+	pConfigParser = new CConfigParser(_T("E:\\rainmeter\\Rainmeter\\Skins\\阿狸\\ini.ini"));
+	wstring val1 = pConfigParser->GetValueString(_T("Rainmeter"),_T("Author"), _T("null"));
+	MessageBox(NULL, val1.c_str(), _T("aaa"), 0);
+	CMainFrame* pMainFrame = (CMainFrame *)AfxGetApp()->GetMainWnd();
+	pMainFrame->AddStrLogToOutputWnd(val1.c_str());
 	
 }
 

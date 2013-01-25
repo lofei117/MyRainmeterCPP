@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ConfigParser.h"
 
 class CMyRainmeterDoc : public CDocument
 {
@@ -14,6 +15,7 @@ protected: // 仅从序列化创建
 // 特性
 public:
 	CString systemBgPath;	//背景图片地址
+	CConfigParser *pConfigParser;
 // 操作
 public:
 

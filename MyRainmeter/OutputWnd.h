@@ -31,6 +31,8 @@ public:
 
 	void UpdateFonts();
 
+	void AddOutput(CString str);
+
 // Ьиад
 protected:
 	CMFCTabCtrl	m_wndTabs;

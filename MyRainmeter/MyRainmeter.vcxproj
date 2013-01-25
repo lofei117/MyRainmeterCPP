@@ -94,6 +94,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="ClassDiagram2.cd" />
     <None Include="ReadMe.txt" />
     <None Include="res\classview.bmp" />
@@ -127,10 +128,12 @@
   <ItemGroup>
     <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="ClassView.h" />
+    <ClInclude Include="ConfigParser.h" />
     <ClInclude Include="ConstInfo.h" />
     <ClInclude Include="FileView.h" />
     <ClInclude Include="KitView.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="Meansure.h" />
     <ClInclude Include="Meter.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="MyRainmeter.h" />
@@ -149,9 +152,11 @@
   <ItemGroup>
     <ClCompile Include="ChildFrm.cpp" />
     <ClCompile Include="ClassView.cpp" />
+    <ClCompile Include="ConfigParser.cpp" />
     <ClCompile Include="FileView.cpp" />
     <ClCompile Include="KitView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="Meansure.cpp" />
     <ClCompile Include="Meter.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="MyRainmeter.cpp" />

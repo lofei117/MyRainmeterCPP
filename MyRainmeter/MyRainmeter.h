@@ -37,6 +37,12 @@ public:
 	afx_msg void OnFileNewConfig();
 	afx_msg void OnFileNewSkin();
 	DECLARE_MESSAGE_MAP()
+	afx_msg void OnFileNew();
+
+private:
+	CView* m_pBitmapView;
+	CView* m_pTextView;
+	CView* SwitchView();
 };
 
 extern CMyRainmeterApp theApp;

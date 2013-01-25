@@ -98,6 +98,7 @@
       <Filter>资源文件</Filter>
     </None>
     <None Include="ClassDiagram2.cd" />
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyRainmeter.h">
@@ -160,6 +161,12 @@
     <ClInclude Include="ConstInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ConfigParser.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Meansure.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyRainmeter.cpp">
@@ -211,6 +218,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ToolTip.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigParser.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Meansure.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

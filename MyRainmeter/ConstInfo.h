@@ -1,9 +1,11 @@
 #pragma once
 
+#define MAX_LINE_LENGTH	4096
+
 enum ToolTipType
-{
-	Ballon=1,
-	Normal=0
+{	
+	Normal=0,
+	Ballon=1
 };
 enum ToolTipIcon
 {
@@ -12,3 +14,16 @@ enum ToolTipIcon
 	Error,
 	Question
 };
+
+enum MeterType
+{
+	
+};
+
+enum MeansureType
+{
+
+};
+
+
+

@@ -20,6 +20,7 @@ public:
 
 // ²Ù×÷
 public:
+	void AddStrLogToOutputWnd(CString str);
 
 // ÖØÐ´
 public:

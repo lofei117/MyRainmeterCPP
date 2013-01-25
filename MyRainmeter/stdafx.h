@@ -25,6 +25,14 @@
 #include <wininet.h>
 
 
+#include <unordered_set>
+#include <unordered_map>
+#include <string>
+#include <cstdint>
+
+using namespace std;
+
+
 #include <afxdisp.h>        // MFC 自动化类
 
 

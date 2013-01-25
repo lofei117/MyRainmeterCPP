@@ -103,7 +103,7 @@ void COutputWnd::AdjustHorzScroll(CListBox& wndListBox)
 	wndListBox.SetHorizontalExtent(cxExtentMax);
 	dc.SelectObject(pOldFont);
 }
-
+ 
 void COutputWnd::FillBuildWindow()
 {
 	m_wndOutputBuild.AddString(_T("生成输出正显示在此处。"));
@@ -130,6 +130,19 @@ void COutputWnd::UpdateFonts()
 	m_wndOutputBuild.SetFont(&afxGlobalData.fontRegular);
 	m_wndOutputDebug.SetFont(&afxGlobalData.fontRegular);
 	m_wndOutputFind.SetFont(&afxGlobalData.fontRegular);
+}
+
+void COutputWnd::AddOutput( CString str )
+{
+	SYSTEMTIME time;
+	GetLocalTime(&time);
+	CString timeStr;
+	timeStr.Format(_T("%4d.%02d.%02d %02d:%02d:%02d"),time.wYear,time.wMonth,time.wDay,time.wHour,time.wMinute,time.wSecond);
+#ifdef _DEBUG
+	m_wndOutputBuild.AddString(_T("[MyRainmeter-Debug ")+timeStr+"]:"+str);
+#else
+	m_wndOutputBuild.AddString(_T("[MyRainmeter ")+timeStr+"]:"+str);
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////

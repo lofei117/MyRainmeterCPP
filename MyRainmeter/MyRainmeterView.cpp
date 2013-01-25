@@ -29,6 +29,7 @@ BEGIN_MESSAGE_MAP(CMyRainmeterView, CScrollView)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CMyRainmeterView::OnFilePrintPreview)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
+	ON_COMMAND(ID_VIEW_CODE, &CMyRainmeterView::OnViewCode)
 END_MESSAGE_MAP()
 
 // CMyRainmeterView 构造/析构
@@ -87,8 +88,10 @@ void CMyRainmeterView::OnDraw(CDC* pDC)
 	// 当且仅当图片未加载时加载
 	if(backgroundImage.IsNull())
 		backgroundImage.Load(pDoc->systemBgPath);
-	backgroundImage.Draw(pDC->m_hDC,0,0,cx, cy);
-	
+	if(!backgroundImage.IsNull())
+		backgroundImage.Draw(pDC->m_hDC,0,0,cx, cy);
+	else
+		AfxMessageBox(_T("桌面背景加载失败！请重新设置背景后试试，如果问题仍然存在，请与我联系~~"));
 	SetScrollSizes(MM_TEXT,CSize(cx, cy));    
 	
 	
@@ -168,3 +171,18 @@ CMyRainmeterDoc* CMyRainmeterView::GetDocument() const // 非调试版本是内联的
 
 
 // CMyRainmeterView 消息处理程序
+
+
+void CMyRainmeterView::OnViewCode()
+{
+	// TODO: 在此添加命令处理程序代码
+	
+	POSITION tDocTemplatePos = theApp.m_pDocManager->GetFirstDocTemplatePosition();
+	CDocTemplate* pDocTemplate = theApp.m_pDocManager->GetNextDocTemplate(tDocTemplatePos);
+	pDocTemplate = theApp.m_pDocManager->GetNextDocTemplate(tDocTemplatePos);
+	if (pDocTemplate!=NULL)
+	{
+		pDocTemplate->OpenDocumentFile(NULL);
+	}
+		
+}
