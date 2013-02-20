@@ -95,7 +95,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
-    <None Include="ClassDiagram2.cd" />
+    <None Include="ClassDiagram2.cd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ReadMe.txt" />
     <None Include="res\classview.bmp" />
     <None Include="res\classview_hc.bmp" />
@@ -134,12 +136,23 @@
     <ClInclude Include="KitView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Meansure.h" />
+    <ClInclude Include="MeansureCalc.h" />
+    <ClInclude Include="MeansureCpu.h" />
+    <ClInclude Include="MeansureFDS.h" />
+    <ClInclude Include="MeansureMemory.h" />
+    <ClInclude Include="MeansureNet.h" />
+    <ClInclude Include="MeansurePlugin.h" />
+    <ClInclude Include="MeansureRegistry.h" />
+    <ClInclude Include="MeansureScript.h" />
+    <ClInclude Include="MeansureTime.h" />
+    <ClInclude Include="MeansureUptime.h" />
     <ClInclude Include="Meter.h" />
+    <ClInclude Include="MeterBar.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="MyRainmeter.h" />
     <ClInclude Include="MyRainmeterDoc.h" />
     <ClInclude Include="MyRainmeterTextView.h" />
-    <ClInclude Include="MyRainmeterView.h" />
+    <ClInclude Include="MyRainmeterGraphView.h" />
     <ClInclude Include="OutputWnd.h" />
     <ClInclude Include="PropertiesWnd.h" />
     <ClInclude Include="Resource.h" />
@@ -157,12 +170,23 @@
     <ClCompile Include="KitView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="Meansure.cpp" />
+    <ClCompile Include="MeansureCalc.cpp" />
+    <ClCompile Include="MeansureCpu.cpp" />
+    <ClCompile Include="MeansureFDS.cpp" />
+    <ClCompile Include="MeansureMemory.cpp" />
+    <ClCompile Include="MeansureNet.cpp" />
+    <ClCompile Include="MeansurePlugin.cpp" />
+    <ClCompile Include="MeansureRegistry.cpp" />
+    <ClCompile Include="MeansureScript.cpp" />
+    <ClCompile Include="MeansureTime.cpp" />
+    <ClCompile Include="MeansureUptime.cpp" />
     <ClCompile Include="Meter.cpp" />
+    <ClCompile Include="MeterBar.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="MyRainmeter.cpp" />
     <ClCompile Include="MyRainmeterDoc.cpp" />
     <ClCompile Include="MyRainmeterTextView.cpp" />
-    <ClCompile Include="MyRainmeterView.cpp" />
+    <ClCompile Include="MyRainmeterGraphView.cpp" />
     <ClCompile Include="OutputWnd.cpp" />
     <ClCompile Include="PropertiesWnd.cpp" />
     <ClCompile Include="RmControl.cpp" />

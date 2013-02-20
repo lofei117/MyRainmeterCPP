@@ -12,7 +12,13 @@ IMPLEMENT_DYNAMIC(CMeansure, CRmControl)
 
 CMeansure::CMeansure()
 {
-
+	m_UpdateDivider=1;
+	m_InvertMeansure=0;
+	m_MaxValue=1.0;
+	m_MinValue=0.0;
+	m_AverageSize=1;
+	m_Disabled=0;
+	m_DynamicVariables=0;
 }
 
 CMeansure::~CMeansure()

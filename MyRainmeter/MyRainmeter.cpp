@@ -10,8 +10,10 @@
 
 #include "ChildFrm.h"
 #include "MyRainmeterDoc.h"
-#include "MyRainmeterView.h"
+#include "MyRainmeterGraphView.h"
 #include "MyRainmeterTextView.h"
+
+#include <AFXPRIV.H>
 
 #include "ConfigParser.h"
 
@@ -123,18 +125,18 @@ BOOL CMyRainmeterApp::InitInstance()
 	pDocTemplate = new CMultiDocTemplate(IDR_MyRainmeterTYPE,
 		RUNTIME_CLASS(CMyRainmeterDoc),
 		RUNTIME_CLASS(CChildFrame), // 自定义 MDI 子框架
-		RUNTIME_CLASS(CMyRainmeterView));
-	if (!pDocTemplate)
-		return FALSE;
-	AddDocTemplate(pDocTemplate);
-	pDocTemplate = new CMultiDocTemplate(IDR_MyRainmeterTYPE,
-		RUNTIME_CLASS(CMyRainmeterDoc),
-		RUNTIME_CLASS(CChildFrame), // 自定义 MDI 子框架
-		RUNTIME_CLASS(CMyRainmeterTextView));
+		RUNTIME_CLASS(CMyRainmeterGraphView));
 	if (!pDocTemplate)
 		return FALSE;
 	AddDocTemplate(pDocTemplate);
 
+	m_pTemplateTxt = new CMultiDocTemplate(IDR_MyRainmeterTYPE,
+		RUNTIME_CLASS(CMyRainmeterDoc),
+		RUNTIME_CLASS(CChildFrame), // 自定义 MDI 子框架
+		RUNTIME_CLASS(CMyRainmeterTextView));
+	if (!m_pTemplateTxt)
+		return FALSE;
+	
 	// 创建主 MDI 框架窗口
 	CMainFrame* pMainFrame = new CMainFrame;
 	if (!pMainFrame || !pMainFrame->LoadFrame(IDR_MAINFRAME))
@@ -156,19 +158,19 @@ BOOL CMyRainmeterApp::InitInstance()
 	// Dispatch commands specified on the command line
 	
 	ParseCommandLine(cmdInfo);
-
-
-
+	
 	// 调度在命令行中指定的命令。如果
 	// 用 /RegServer、/Register、/Unregserver 或 /Unregister 启动应用程序，则返回 FALSE。
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
+
 	// 主窗口已初始化，因此显示它并对其进行更新
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();
 
 	return TRUE;
 }
+
 
 int CMyRainmeterApp::ExitInstance()
 {
@@ -249,8 +251,10 @@ void CMyRainmeterApp::SaveCustomState()
 void CMyRainmeterApp::OnFileNewConfig()
 {
 	// TODO: 在此添加命令处理程序代码
-
-	CWinAppEx::OnFileNew();
+	POSITION tFirstDocTemplatePos = theApp.m_pDocManager->GetFirstDocTemplatePosition();
+	CDocTemplate* pBitmapViewDocTemplate = theApp.m_pDocManager->GetNextDocTemplate(tFirstDocTemplatePos);
+	pBitmapViewDocTemplate->OpenDocumentFile(NULL);
+	//CWinAppEx::OnFileNew();
 }
 
 
@@ -276,5 +280,6 @@ void CMyRainmeterApp::OnFileNew()
 	//}
 	POSITION tFirstDocTemplatePos = theApp.m_pDocManager->GetFirstDocTemplatePosition();
 	CDocTemplate* pBitmapViewDocTemplate = theApp.m_pDocManager->GetNextDocTemplate(tFirstDocTemplatePos);
-	pBitmapViewDocTemplate->OpenDocumentFile(NULL);
+//	pBitmapViewDocTemplate->OpenDocumentFile(NULL);
+	pBitmapViewDocTemplate->CreateNewDocument();
 }

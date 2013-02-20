@@ -12,6 +12,8 @@
 #include "MyRainmeterDoc.h"
 #include "MainFrm.h"
 
+#include "MyRainmeterTextView.h"
+
 #include <propkey.h>
 
 #ifdef _DEBUG
@@ -31,16 +33,16 @@ END_MESSAGE_MAP()
 CMyRainmeterDoc::CMyRainmeterDoc()
 {
 	// TODO: 在此添加一次性构造代码
-	pConfigParser = new CConfigParser(_T("E:\\rainmeter\\Rainmeter\\Skins\\阿狸\\ini.ini"));
-	wstring val1 = pConfigParser->GetValueString(_T("Rainmeter"),_T("Author"), _T("null"));
-	MessageBox(NULL, val1.c_str(), _T("aaa"), 0);
-	CMainFrame* pMainFrame = (CMainFrame *)AfxGetApp()->GetMainWnd();
-	pMainFrame->AddStrLogToOutputWnd(val1.c_str());
 	
+	m_pTextViewFrame = NULL;
+
 }
 
 CMyRainmeterDoc::~CMyRainmeterDoc()
 {
+	
+//	delete systemBgPath;
+//	delete pConfigParser;
 }
 
 BOOL CMyRainmeterDoc::OnNewDocument()
@@ -51,6 +53,23 @@ BOOL CMyRainmeterDoc::OnNewDocument()
 	// TODO: 在此添加重新初始化代码
 	// (SDI 文档将重用该文档)
 
+	InitDocument();
+
+	return TRUE;
+}
+
+
+BOOL CMyRainmeterDoc::OnOpenDocument( LPCTSTR lpszPathName )
+{
+	if (!CDocument::OnOpenDocument(lpszPathName))
+		return FALSE;
+	InitDocument();
+	return TRUE;
+}
+
+
+void CMyRainmeterDoc::InitDocument()
+{
 	///获取桌面背景图片地址
 	HRESULT hr;//用于保存返回值
 	IActiveDesktop* pIAD;//桌面接口实例
@@ -59,10 +78,49 @@ BOOL CMyRainmeterDoc::OnNewDocument()
 	hr=pIAD->GetWallpaper(wszWallpaper,MAX_PATH,0);//获取背景图片路径
 	systemBgPath = wszWallpaper;
 
-	return TRUE;
+	pConfigParser = new CConfigParser(_T("E:\\rainmeter\\Rainmeter\\Skins\\阿狸\\ini.ini"));
+	wstring val1 = pConfigParser->GetValueString(_T("Rainmeter"),_T("Author"), _T("null"));
+	MessageBox(NULL, val1.c_str(), _T("aaa"), 0);
+	CMainFrame* pMainFrame = (CMainFrame *)AfxGetApp()->GetMainWnd();
+	pMainFrame->AddStrLogToOutputWnd(val1.c_str());
+
+
+	
 }
 
 
+void CMyRainmeterDoc::SwitchViewCodeFrame()
+{
+	if(m_pTextViewFrame == NULL)
+	{
+		// Create TextView frame
+		CMainFrame *pMainFrame = (CMainFrame *)AfxGetMainWnd();
+		CMDIChildWnd* pActiveChild = pMainFrame->MDIGetActive();
+
+		if (pActiveChild == NULL )
+		{
+			TRACE0("Warning: No active document for WindowNew command\n");
+			AfxMessageBox(AFX_IDP_COMMAND_FAILURE);
+			return ;     // command failed
+		}
+		CDocTemplate* pTemplate = theApp.m_pTemplateTxt;
+		ASSERT_VALID(pTemplate);
+
+		m_pTextViewFrame = pTemplate->CreateNewFrame(this, pActiveChild);
+		if (m_pTextViewFrame == NULL)
+		{
+			TRACE0("Warning: failed to create new frame\n");
+			AfxMessageBox(AFX_IDP_COMMAND_FAILURE);
+			return ;     // command failed
+		}
+		pTemplate->InitialUpdateFrame(m_pTextViewFrame, this);
+	}
+	else
+	{
+		CDocTemplate* pTemplate = theApp.m_pTemplateTxt;
+		pTemplate->InitialUpdateFrame(m_pTextViewFrame, this);
+	}
+}
 
 
 // CMyRainmeterDoc 序列化
@@ -145,6 +203,8 @@ void CMyRainmeterDoc::Dump(CDumpContext& dc) const
 {
 	CDocument::Dump(dc);
 }
+
+
 #endif //_DEBUG
 
 

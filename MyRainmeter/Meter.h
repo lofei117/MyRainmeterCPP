@@ -28,7 +28,7 @@ protected:
 	bool m_Hidden;
 	CString m_MeterName;
 	
-//	CMeter* m_RelativeMeter;
+	CMeter* m_RelativeMeter;
 	CMeter* m_MeterStyle;
 
 // public methods

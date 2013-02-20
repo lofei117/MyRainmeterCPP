@@ -119,9 +119,6 @@
     <ClInclude Include="MyRainmeterDoc.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MyRainmeterView.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -167,6 +164,42 @@
     <ClInclude Include="Meansure.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MyRainmeterGraphView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeterBar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeansureCalc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeansureCpu.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeansureFDS.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeansureMemory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeansureNet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeansurePlugin.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeansureRegistry.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeansureScript.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeansureTime.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeansureUptime.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyRainmeter.cpp">
@@ -182,9 +215,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MyRainmeterDoc.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="MyRainmeterView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="FileView.cpp">
@@ -224,6 +254,42 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Meansure.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyRainmeterGraphView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeterBar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeansureCalc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeansureCpu.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeansureFDS.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeansureMemory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeansureNet.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeansurePlugin.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeansureRegistry.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeansureScript.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeansureTime.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeansureUptime.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

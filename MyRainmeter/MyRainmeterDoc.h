@@ -16,12 +16,19 @@ protected: // 仅从序列化创建
 public:
 	CString systemBgPath;	//背景图片地址
 	CConfigParser *pConfigParser;
+	CFrameWnd* m_pTextViewFrame;
+
 // 操作
 public:
+	void SwitchViewCodeFrame();
+
+private:
+	void InitDocument();
 
 // 重写
 public:
 	virtual BOOL OnNewDocument();
+	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
 	virtual void Serialize(CArchive& ar);
 #ifdef SHARED_HANDLERS
 	virtual void InitializeSearchContent();

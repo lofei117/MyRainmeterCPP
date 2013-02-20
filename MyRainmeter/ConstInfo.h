@@ -25,5 +25,13 @@ enum MeansureType
 
 };
 
+enum ImageCropOrigin
+{
+	TopLeft=1,
+	TopRight,
+	BottomRight,
+	BottomLeft,
+	Center
+};
 
 

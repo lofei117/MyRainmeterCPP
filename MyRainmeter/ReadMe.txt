@@ -53,8 +53,8 @@ MyRainmeterDoc.h，MyRainmeterDoc.cpp - 文档
 这些文件包含 CMyRainmeterDoc 类。编辑这些文件可以添加特殊文档数据并可实现文件保存和加载(通过 CMyRainmeterDoc::Serialize)。
 
 MyRainmeterView.h，MyRainmeterView.cpp - 文档的视图
-这些文件包含 CMyRainmeterView 类。
-CMyRainmeterView 对象用于查看 CMyRainmeterDoc 对象。
+这些文件包含 CMyRainmeterGraphView 类。
+CMyRainmeterGraphView 对象用于查看 CMyRainmeterDoc 对象。
 
 res\MyRainmeterDoc.ico
 这是图标文件，它用作 CMyRainmeterDoc 类的 MDI 子窗口的图标。此图标包括在主要资源文件 MyRainmeter.rc 中。

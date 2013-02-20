@@ -7,7 +7,7 @@ class CMyRainmeterTextView : public CEditView
 {
 	DECLARE_DYNCREATE(CMyRainmeterTextView)
 
-protected:
+public:
 	CMyRainmeterTextView();           // 动态创建所使用的受保护的构造函数
 	virtual ~CMyRainmeterTextView();
 

@@ -19,6 +19,8 @@ class CMyRainmeterApp : public CWinAppEx
 public:
 	CMyRainmeterApp();
 
+public:
+	CMultiDocTemplate* m_pTemplateTxt;
 
 // ÖØÐ´
 public:
@@ -39,10 +41,6 @@ public:
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnFileNew();
 
-private:
-	CView* m_pBitmapView;
-	CView* m_pTextView;
-	CView* SwitchView();
 };
 
 extern CMyRainmeterApp theApp;
