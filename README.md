@@ -1,7 +1,7 @@
 #MyRainmeter
 
 ##What's this?
-MyRainmeter is a windows execution program written with c++ and is based on MFC MDI, used to help rainmeter skin makes to design and make the skin easily.
+MyRainmeter is a windows execution program written with c++ and is based on MFC MDI, used to help rainmeter skin makers to design and make the skin easily.
 
 ##How to use it?
 Well, when the alpha version is produced I will write a tutorial in detail.
