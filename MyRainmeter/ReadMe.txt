@@ -52,7 +52,7 @@ ChildFrm.h，ChildFrm.cpp
 MyRainmeterDoc.h，MyRainmeterDoc.cpp - 文档
 这些文件包含 CMyRainmeterDoc 类。编辑这些文件可以添加特殊文档数据并可实现文件保存和加载(通过 CMyRainmeterDoc::Serialize)。
 
-MyRainmeterView.h，MyRainmeterView.cpp - 文档的视图
+MyRainmeterGraphView.h，MyRainmeterGraphView.cpp - 文档的视图
 这些文件包含 CMyRainmeterGraphView 类。
 CMyRainmeterGraphView 对象用于查看 CMyRainmeterDoc 对象。
 

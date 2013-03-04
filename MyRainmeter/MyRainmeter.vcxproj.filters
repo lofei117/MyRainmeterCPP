@@ -99,6 +99,7 @@
     </None>
     <None Include="ClassDiagram2.cd" />
     <None Include="ClassDiagram1.cd" />
+    <None Include="develop_log.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyRainmeter.h">
@@ -200,6 +201,9 @@
     <ClInclude Include="MeansureUptime.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Ruler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyRainmeter.cpp">
@@ -290,6 +294,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MeansureUptime.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Ruler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

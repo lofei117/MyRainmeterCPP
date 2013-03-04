@@ -4,6 +4,11 @@
 
 #include "stdafx.h"
 #include "MyRainmeter.h"
+#include "MyRainmeterDoc.h"
+
+#include "Corner.h"
+#include "VRuler.h"
+#include "HRuler.h"
 
 #include "ChildFrm.h"
 
@@ -16,6 +21,7 @@
 IMPLEMENT_DYNCREATE(CChildFrame, CMDIChildWndEx)
 
 BEGIN_MESSAGE_MAP(CChildFrame, CMDIChildWndEx)
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 // CChildFrame 构造/析构
@@ -55,3 +61,38 @@ void CChildFrame::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 // CChildFrame 消息处理程序
+
+
+BOOL CChildFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	if(pContext->m_pNewViewClass->m_lpszClassName == "CMyRainmeterTextView")
+	{
+		return CMDIChildWndEx::OnCreateClient(lpcs, pContext);
+	}
+	if (!m_Rulers.CreateRulers(this, pContext)) {
+		TRACE("Error creation of rulers\n");
+		return CMDIChildWnd::OnCreateClient(lpcs, pContext);
+	}
+
+	return TRUE;
+	//return CMDIChildWndEx::OnCreateClient(lpcs, pContext);
+}
+
+
+void CChildFrame::OnClose()
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	CMDIChildWndEx::OnClose();
+}
+
+void CChildFrame::ShowRulers( BOOL bShow )
+{
+	m_Rulers.ShowRulers(bShow);
+}
+
+void CChildFrame::UpdateRulersInfo(stRULER_INFO stRulerInfo)
+{
+	m_Rulers.UpdateRulersInfo(stRulerInfo);
+}
+	

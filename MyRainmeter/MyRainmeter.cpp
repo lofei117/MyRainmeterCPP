@@ -254,6 +254,7 @@ void CMyRainmeterApp::OnFileNewConfig()
 	POSITION tFirstDocTemplatePos = theApp.m_pDocManager->GetFirstDocTemplatePosition();
 	CDocTemplate* pBitmapViewDocTemplate = theApp.m_pDocManager->GetNextDocTemplate(tFirstDocTemplatePos);
 	pBitmapViewDocTemplate->OpenDocumentFile(NULL);
+	
 	//CWinAppEx::OnFileNew();
 }
 
@@ -269,7 +270,6 @@ void CMyRainmeterApp::OnFileNewSkin()
 void CMyRainmeterApp::OnFileNew()
 {
 	// TODO: 在此添加命令处理程序代码
-	MessageBox(NULL, _T("test"), _T("aaa"), 0);
 	//for(POSITION tPos = theApp.m_pDocManager->GetFirstDocTemplatePosition();tPos!=NULL;)
 	//{
 	//	//get pointer to the CdocTemplates.
@@ -280,6 +280,5 @@ void CMyRainmeterApp::OnFileNew()
 	//}
 	POSITION tFirstDocTemplatePos = theApp.m_pDocManager->GetFirstDocTemplatePosition();
 	CDocTemplate* pBitmapViewDocTemplate = theApp.m_pDocManager->GetNextDocTemplate(tFirstDocTemplatePos);
-//	pBitmapViewDocTemplate->OpenDocumentFile(NULL);
-	pBitmapViewDocTemplate->CreateNewDocument();
+	pBitmapViewDocTemplate->OpenDocumentFile(NULL);
 }

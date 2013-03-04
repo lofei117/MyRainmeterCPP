@@ -33,8 +33,6 @@ END_MESSAGE_MAP()
 CMyRainmeterDoc::CMyRainmeterDoc()
 {
 	// TODO: 在此添加一次性构造代码
-	
-	m_pTextViewFrame = NULL;
 
 }
 
@@ -83,14 +81,27 @@ void CMyRainmeterDoc::InitDocument()
 	MessageBox(NULL, val1.c_str(), _T("aaa"), 0);
 	CMainFrame* pMainFrame = (CMainFrame *)AfxGetApp()->GetMainWnd();
 	pMainFrame->AddStrLogToOutputWnd(val1.c_str());
-
-
 	
 }
 
 
 void CMyRainmeterDoc::SwitchViewCodeFrame()
 {
+	CFrameWnd *m_pTextViewFrame = NULL;
+
+	// Check and set the TextViewFrame
+	POSITION pos = GetFirstViewPosition();
+	while (pos != NULL)
+	{
+		CView* pView = GetNextView( pos );
+		if (pView->IsKindOf(RUNTIME_CLASS(CMyRainmeterTextView)))
+		{
+			m_pTextViewFrame = pView->GetParentFrame();
+			break;
+		}
+	}
+		
+	// if TextViewFrame doesn't exist (NULL), initialize and display it.
 	if(m_pTextViewFrame == NULL)
 	{
 		// Create TextView frame
@@ -115,8 +126,8 @@ void CMyRainmeterDoc::SwitchViewCodeFrame()
 		}
 		pTemplate->InitialUpdateFrame(m_pTextViewFrame, this);
 	}
-	else
-	{
+	else	// TextViewFrame exists, just switch to show it
+	{		
 		CDocTemplate* pTemplate = theApp.m_pTemplateTxt;
 		pTemplate->InitialUpdateFrame(m_pTextViewFrame, this);
 	}

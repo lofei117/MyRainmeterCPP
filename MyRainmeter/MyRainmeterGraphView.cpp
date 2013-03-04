@@ -1,5 +1,5 @@
 
-// MyRainmeterView.cpp : CMyRainmeterGraphView ÀàµÄÊµÏÖ
+// MyRainmeterGraphView.cpp : CMyRainmeterGraphView ÀàµÄÊµÏÖ
 //
 
 #include "stdafx.h"
@@ -14,9 +14,15 @@
 #include "Meter.h"
 #include "MainFrm.h"
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+
+#define ZOOM_MAX            2
+#define ZOOM_MIN            0.25
+#define ZOOM_NORMAL         1
 
 
 // CMyRainmeterGraphView
@@ -24,6 +30,16 @@
 IMPLEMENT_DYNCREATE(CMyRainmeterGraphView, CScrollView)
 
 BEGIN_MESSAGE_MAP(CMyRainmeterGraphView, CScrollView)
+	//{{AFX_MSG_MAP(CDemoView)
+	//ON_COMMAND(ID_DEMO_TOGGLERULERS, OnRulersTogglerulers)
+	//ON_UPDATE_COMMAND_UI(ID_DEMO_TOGGLERULERS, OnUpdateRulersTogglerulers)
+	ON_WM_ERASEBKGND()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_MOUSEMOVE()
+	ON_WM_VSCROLL()
+	ON_WM_HSCROLL()
+	ON_WM_SETCURSOR()
+	//}}AFX_MSG_MAP
 	// ±ê×¼´òÓ¡ÃüÁî
 	ON_COMMAND(ID_FILE_PRINT, &CScrollView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CScrollView::OnFilePrint)
@@ -31,6 +47,7 @@ BEGIN_MESSAGE_MAP(CMyRainmeterGraphView, CScrollView)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
 	ON_COMMAND(ID_VIEW_CODE, &CMyRainmeterGraphView::OnViewCode)
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 // CMyRainmeterGraphView ¹¹Ôì/Îö¹¹
@@ -38,12 +55,18 @@ END_MESSAGE_MAP()
 CMyRainmeterGraphView::CMyRainmeterGraphView()
 {
 	// TODO: ÔÚ´Ë´¦Ìí¼Ó¹¹Ôì´úÂë
-	
+	m_pParent           = NULL;
+	m_BrushBackGround.CreateHatchBrush(HS_DIAGCROSS, RGB(191, 191, 191));
+	m_bShowRulers       = TRUE;
+	int cx = GetSystemMetrics(SM_CXFULLSCREEN);
+	int cy = GetSystemMetrics(SM_CYFULLSCREEN);
+	m_DesktopSize = CSize(cx, cy);
 }
 
 CMyRainmeterGraphView::~CMyRainmeterGraphView()
 {
-	
+	//m_BackgroundImage.Destroy();
+	m_BrushBackGround.DeleteObject();
 }
 
 BOOL CMyRainmeterGraphView::PreCreateWindow(CREATESTRUCT& cs)
@@ -84,19 +107,18 @@ void CMyRainmeterGraphView::OnDraw(CDC* pDC)
 	//pDC->StretchBlt(0,0,rect.Width(),rect.Height(),&dcMem,0,0,bitMap.bmWidth,bitMap.bmHeight,SRCCOPY);	
 
 	//»ñÈ¡ÆÁÄ»´óÐ¡ °üÀ¨ÈÎÎñÀ¸
-	int cx = GetSystemMetrics(SM_CXFULLSCREEN);
-	int cy = GetSystemMetrics(SM_CYFULLSCREEN);
 	// µ±ÇÒ½öµ±Í¼Æ¬Î´¼ÓÔØÊ±¼ÓÔØ
-	if(backgroundImage.IsNull())
-		backgroundImage.Load(pDoc->systemBgPath);
-	if(!backgroundImage.IsNull())
-		backgroundImage.Draw(pDC->m_hDC,0,0,cx, cy);
+	if(m_BackgroundImage.IsNull())
+		m_BackgroundImage.Load(pDoc->systemBgPath);
+	if(!m_BackgroundImage.IsNull())
+		m_BackgroundImage.Draw(pDC->m_hDC,0,0, m_DesktopSize.cx, m_DesktopSize.cy);
 	else
 		AfxMessageBox(_T("×ÀÃæ±³¾°¼ÓÔØÊ§°Ü£¡ÇëÖØÐÂÉèÖÃ±³¾°ºóÊÔÊÔ£¬Èç¹ûÎÊÌâÈÔÈ»´æÔÚ£¬ÇëÓëÎÒÁªÏµ~~"));
-	SetScrollSizes(MM_TEXT,CSize(cx, cy));    
-	
-	
-	//AfxMessageBox(pDoc->systemBgPath);
+
+	CRect rect;
+	GetClientRect(&rect);
+	SetScrollSizes(MM_TEXT, m_DesktopSize);    
+		
 }
 
 // 
@@ -104,9 +126,13 @@ void CMyRainmeterGraphView::OnInitialUpdate()
 {
 	CScrollView::OnInitialUpdate();
 	
-	int cx = GetSystemMetrics(SM_CXFULLSCREEN);
+	/*int cx = GetSystemMetrics(SM_CXFULLSCREEN);
 	int cy = GetSystemMetrics(SM_CYFULLSCREEN);
-	SetScrollSizes(MM_TEXT,CSize(cx, cy)); 
+	SetScrollSizes(MM_TEXT,CSize(cx, cy)); */
+	SetScrollSizes(MM_TEXT, m_DesktopSize);  
+	m_pParent = ((CChildFrame*)GetParentFrame());
+	m_pParent->ShowRulers(TRUE);
+	OnUpdate(NULL, 0, NULL);
 }
 
 
@@ -178,7 +204,83 @@ CMyRainmeterDoc* CMyRainmeterGraphView::GetDocument() const // ·Çµ÷ÊÔ°æ±¾ÊÇÄÚÁªµ
 void CMyRainmeterGraphView::OnViewCode()
 {
 	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌÐò´úÂë
-	GetDocument()->SwitchViewCodeFrame();
-
-	
+	GetDocument()->SwitchViewCodeFrame();	
 }
+
+
+void CMyRainmeterGraphView::OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/)
+{
+	// TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+	
+	SetScrollSizes(MM_TEXT, m_DesktopSize);   
+	UpdateRulersInfo(RW_POSITION, GetScrollPosition());
+	Invalidate();	
+}
+
+void CMyRainmeterGraphView::OnRulersTogglerulers() 
+{
+	m_bShowRulers = !m_bShowRulers;
+	m_pParent->ShowRulers(m_bShowRulers);
+}
+
+void CMyRainmeterGraphView::OnUpdateRulersTogglerulers(CCmdUI* pCmdUI) 
+{
+	pCmdUI->SetCheck(m_bShowRulers);
+}
+
+void CMyRainmeterGraphView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌÐò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
+
+	// Update the ruler mark
+	UpdateRulersInfo(RW_POSITION, GetScrollPosition(), point);
+
+	CScrollView::OnMouseMove(nFlags, point);
+}
+
+
+
+BOOL CMyRainmeterGraphView::OnEraseBkgnd( CDC* pDC )
+{
+	FillOutsideRect(pDC, &m_BrushBackGround);
+
+	return FALSE;//CScrollView::OnEraseBkgnd(pDC);
+}
+
+void CMyRainmeterGraphView::OnLButtonDown( UINT nFlags, CPoint point )
+{
+	// TODO:
+	CScrollView::OnLButtonDown(nFlags, point);
+}
+
+void CMyRainmeterGraphView::OnVScroll( UINT nSBCode, UINT nPos, CScrollBar* pScrollBar )
+{
+	UpdateRulersInfo(RW_VSCROLL, GetScrollPosition());
+	Invalidate(FALSE);
+
+	CScrollView::OnVScroll(nSBCode, nPos, pScrollBar);
+}
+
+void CMyRainmeterGraphView::OnHScroll( UINT nSBCode, UINT nPos, CScrollBar* pScrollBar )
+{
+	UpdateRulersInfo(RW_HSCROLL, GetScrollPosition());
+	Invalidate(FALSE);
+
+	CScrollView::OnHScroll(nSBCode, nPos, pScrollBar);
+}
+
+void CMyRainmeterGraphView::UpdateRulersInfo( int nMessage, CPoint ScrollPos, CPoint Pos /*= CPoint(0, 0)*/ )
+{
+	if (!m_pParent)
+		return;
+	stRULER_INFO pRulerInfo;
+	pRulerInfo.uMessage    = nMessage;
+	pRulerInfo.ScrollPos   = ScrollPos;
+	pRulerInfo.Pos         = Pos;
+	pRulerInfo.DocSize     = m_DesktopSize;
+	pRulerInfo.fZoomFactor = 1;
+
+	m_pParent->UpdateRulersInfo(pRulerInfo);
+}
+
+

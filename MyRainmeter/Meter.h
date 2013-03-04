@@ -25,7 +25,7 @@ protected:
 	int m_Y;
 	int m_W;
 	int m_H;
-	bool m_Hidden;
+	int m_Hidden;
 	CString m_MeterName;
 	
 	CMeter* m_RelativeMeter;

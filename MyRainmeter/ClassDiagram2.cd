@@ -116,7 +116,7 @@
     <Position X="2.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAAAEBAAAAAGAJAgABAgAAAAAAAAAgJAAAIAQA=</HashCode>
-      <FileName>MyRainmeterView.h</FileName>
+      <FileName>MyRainmeterGraphView.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="COutputList" Collapsed="true">

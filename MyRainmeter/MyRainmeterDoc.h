@@ -16,7 +16,6 @@ protected: // 仅从序列化创建
 public:
 	CString systemBgPath;	//背景图片地址
 	CConfigParser *pConfigParser;
-	CFrameWnd* m_pTextViewFrame;
 
 // 操作
 public:
