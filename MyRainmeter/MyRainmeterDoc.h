@@ -6,6 +6,8 @@
 
 #include "ConfigParser.h"
 
+class CMyRainmeterGraphView;
+
 class CMyRainmeterDoc : public CDocument
 {
 protected: // 仅从序列化创建
@@ -16,10 +18,21 @@ protected: // 仅从序列化创建
 public:
 	CString systemBgPath;	//背景图片地址
 	CConfigParser *pConfigParser;
+//	CRmCtrlList m_RmCtrls;
+	/// Items 
+	CArray<CXTPTaskPanelGroupItem*, CXTPTaskPanelGroupItem*> m_arrItems;
 
 // 操作
 public:
 	void SwitchViewCodeFrame();
+//	CRmCtrlList* GetRmCtrls(){return &m_RmCtrls;}
+	void Draw(CDC* pDC, CMyRainmeterGraphView* pView);
+	CRmControl* RmCtrlAt(const CPoint& point);
+	// ------ Draw called for live icon and Win7 taskbar thumbnails
+	void Draw (CDC* pDC);
+	void FixUpRmCtrlPositions();
+	void Add(CRmControl* pObj);
+	void Remove(CRmControl* pObj);
 
 private:
 	void InitDocument();

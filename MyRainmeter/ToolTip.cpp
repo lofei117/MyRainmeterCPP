@@ -8,7 +8,7 @@
 
 // CRmControl
 
-IMPLEMENT_DYNAMIC(CToolTip, CRmControl)
+IMPLEMENT_DYNAMIC(CToolTip, CWnd)
 
 	CToolTip::CToolTip()
 {
@@ -20,7 +20,7 @@ CToolTip::~CToolTip()
 }
 
 
-BEGIN_MESSAGE_MAP(CToolTip, CRmControl)
+BEGIN_MESSAGE_MAP(CToolTip, CWnd)
 END_MESSAGE_MAP()
 
 

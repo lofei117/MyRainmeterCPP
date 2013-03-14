@@ -8,7 +8,7 @@
 
 // CMeansure
 
-IMPLEMENT_DYNAMIC(CMeansure, CRmControl)
+IMPLEMENT_DYNAMIC(CMeansure, CWnd)
 
 CMeansure::CMeansure()
 {
@@ -26,7 +26,7 @@ CMeansure::~CMeansure()
 }
 
 
-BEGIN_MESSAGE_MAP(CMeansure, CRmControl)
+BEGIN_MESSAGE_MAP(CMeansure, CWnd)
 END_MESSAGE_MAP()
 
 

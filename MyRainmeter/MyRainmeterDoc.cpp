@@ -81,7 +81,7 @@ void CMyRainmeterDoc::InitDocument()
 	MessageBox(NULL, val1.c_str(), _T("aaa"), 0);
 	CMainFrame* pMainFrame = (CMainFrame *)AfxGetApp()->GetMainWnd();
 	pMainFrame->AddStrLogToOutputWnd(val1.c_str());
-	
+
 }
 
 
@@ -213,6 +213,57 @@ void CMyRainmeterDoc::AssertValid() const
 void CMyRainmeterDoc::Dump(CDumpContext& dc) const
 {
 	CDocument::Dump(dc);
+}
+
+void CMyRainmeterDoc::Add( CRmControl* pObj )
+{
+//	m_RmCtrls.AddTail(pObj);
+//	pObj->m_pDocument = this;
+	SetModifiedFlag();
+}
+
+void CMyRainmeterDoc::Remove( CRmControl* pObj )
+{
+
+	SetModifiedFlag();
+}
+
+CRmControl* CMyRainmeterDoc::RmCtrlAt( const CPoint& point )
+{
+	//CRect rect(point, CSize(1, 1));
+	//POSITION pos = m_RmCtrls.GetTailPosition();
+	//while (pos != NULL)
+	//{
+	//	CRmControl* pObj = m_RmCtrls.GetPrev(pos);
+	//	if (pObj->Intersects(rect))
+	//		return pObj;
+	//}
+
+	return NULL;
+}
+
+void CMyRainmeterDoc::Draw( CDC* pDC, CMyRainmeterGraphView* pView )
+{
+//	POSITION pos = m_RmCtrls.GetHeadPosition();
+//	while (pos != NULL)
+//	{
+//		CRmControl* pObj = m_RmCtrls.GetNext(pos);
+//		pObj->Draw(pDC);
+//#ifndef SHARED_HANDLERS
+//		if (pView != NULL && pView->m_bActive && !pDC->IsPrinting() && pView->IsSelected(pObj))
+//			pObj->DrawTracker(pDC, CDrawObj::selected);
+//#endif
+//	}
+}
+
+void CMyRainmeterDoc::Draw( CDC* pDC )
+{
+	
+}
+
+void CMyRainmeterDoc::FixUpRmCtrlPositions()
+{
+
 }
 
 

@@ -100,6 +100,12 @@
     <None Include="ClassDiagram2.cd" />
     <None Include="ClassDiagram1.cd" />
     <None Include="develop_log.txt" />
+    <None Include="res\Toolbox.bmp">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\Trash.bmp">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyRainmeter.h">
@@ -150,9 +156,6 @@
     <ClInclude Include="KitView.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="RmControl.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ToolTip.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -166,9 +169,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MyRainmeterGraphView.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="MeterBar.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MeansureCalc.h">
@@ -202,6 +202,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Ruler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeterBar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RmControl.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -248,9 +254,6 @@
     <ClCompile Include="KitView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="RmControl.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="ToolTip.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -261,9 +264,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MyRainmeterGraphView.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="MeterBar.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MeansureCalc.cpp">
@@ -297,6 +297,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Ruler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeterBar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RmControl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

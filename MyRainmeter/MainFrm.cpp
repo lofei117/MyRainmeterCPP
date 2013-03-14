@@ -134,8 +134,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockPane(&m_wndFileView);
 	CDockablePane* pTabbedBar = NULL;
 	m_wndClassView.AttachToTabWnd(&m_wndFileView, DM_SHOW, TRUE, &pTabbedBar);
-	CDockablePane* pTabbedBar2 = NULL;
-	m_wndKitView.AttachToTabWnd(&m_wndFileView, DM_SHOW, TRUE, &pTabbedBar2);
+	CDockablePane* pTabbedBarForKitView = NULL;
+	m_wndKitView.AttachToTabWnd(&m_wndFileView, DM_SHOW, TRUE, &pTabbedBarForKitView);
 	m_wndOutput.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndOutput);
 	m_wndProperties.EnableDocking(CBRS_ALIGN_ANY);
@@ -448,4 +448,9 @@ void CMainFrame::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 void CMainFrame::AddStrLogToOutputWnd( CString str )
 {
 	m_wndOutput.AddOutput(str);	
+}
+
+CKitView* CMainFrame::GetKitVew()
+{
+	return &(this->m_wndKitView);
 }

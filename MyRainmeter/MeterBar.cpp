@@ -8,7 +8,7 @@
 
 // CMeterBar
 
-IMPLEMENT_DYNAMIC(CMeterBar, CMeter)
+
 
 CMeterBar::CMeterBar()
 {
@@ -19,9 +19,17 @@ CMeterBar::~CMeterBar()
 {
 }
 
+void CMeterBar::Serialize( CArchive& ar )
+{
 
-BEGIN_MESSAGE_MAP(CMeterBar, CMeter)
-END_MESSAGE_MAP()
+}
+
+void CMeterBar::Draw( CDC* pDC )
+{
+
+}
+
+
 
 
 

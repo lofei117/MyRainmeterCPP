@@ -16,6 +16,9 @@ protected: // 仅从序列化创建
 public:
 	CMyRainmeterDoc* GetDocument() const;
 private:	
+	CBitmap m_BgBitmap;
+	CBitmap *m_pbmCurrent;
+
 	CImage m_BackgroundImage;
 	CChildFrame* m_pParent;
 	CBrush       m_BrushBackGround;
@@ -23,13 +26,24 @@ private:
 	CPoint       m_RefScroll;
 	CPoint       m_RefPoint;
 	BOOL         m_bShowRulers;
+	COleDropTarget m_wndDragTarget;	
+
+	
+	CXTPImageManager m_imageManager;
 
 // 操作
 public:
+	virtual void DrawBackground(CDC* pDc);
 
 private:
+	void PASCAL operator delete(void* p) {
+		CStatic::operator delete(p);
+	}
 	void UpdateRulersInfo(int nMessage, CPoint ScrollPos, CPoint Pos = CPoint(0, 0)); 
 
+	/// xxx
+	CXTPTaskPanel* GetTaskPanel();
+	BOOL PtInTrash(CPoint point);
 
 // 重写
 public:
@@ -68,6 +82,8 @@ public:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	virtual DROPEFFECT OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
+	virtual BOOL OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point);
 };
 
 #ifndef _DEBUG  // MyRainmeterGraphView.cpp 中的调试版本

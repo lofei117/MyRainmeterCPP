@@ -139,9 +139,9 @@ void COutputWnd::AddOutput( CString str )
 	CString timeStr;
 	timeStr.Format(_T("%4d.%02d.%02d %02d:%02d:%02d"),time.wYear,time.wMonth,time.wDay,time.wHour,time.wMinute,time.wSecond);
 #ifdef _DEBUG
-	m_wndOutputBuild.AddString(_T("[MyRainmeter-Debug ")+timeStr+"]:"+str);
+	m_wndOutputBuild.AddString(_T("[MyRainmeter-Debug ")+timeStr+_T("]:")+str);
 #else
-	m_wndOutputBuild.AddString(_T("[MyRainmeter ")+timeStr+"]:"+str);
+	m_wndOutputBuild.AddString(_T("[MyRainmeter ")+timeStr+_T("]:")+str);
 #endif
 }
 

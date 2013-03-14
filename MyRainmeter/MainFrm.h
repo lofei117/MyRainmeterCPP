@@ -21,6 +21,7 @@ public:
 // 操作
 public:
 	void AddStrLogToOutputWnd(CString str);
+	CKitView* GetKitVew();
 
 // 重写
 public:
@@ -45,6 +46,8 @@ protected:  // 控件条嵌入成员
 	CKitView		  m_wndKitView;
 	COutputWnd        m_wndOutput;
 	CPropertiesWnd    m_wndProperties;
+	
+	
 
 // 生成的消息映射函数
 protected:

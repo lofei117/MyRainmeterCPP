@@ -4,7 +4,7 @@
 
 // CMeansure
 
-class CMeansure : public CRmControl
+class CMeansure : public CWnd
 {
 	DECLARE_DYNAMIC(CMeansure)
 

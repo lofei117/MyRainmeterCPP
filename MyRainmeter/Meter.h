@@ -1,12 +1,10 @@
 #pragma once
 
-#include "RmControl.h"
 
 // CMeter
 
-class CMeter : public CRmControl
-{
-	DECLARE_DYNAMIC(CMeter)
+class CMeter
+{	
 	
 // Constructor and Destructor
 public:
@@ -77,8 +75,6 @@ private:
 // protected methods
 protected:
 
-protected:
-	DECLARE_MESSAGE_MAP()
 };
 
 

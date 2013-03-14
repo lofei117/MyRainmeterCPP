@@ -5,7 +5,7 @@
 
 // ToolTip
 
-class CToolTip : public CRmControl
+class CToolTip : public CWnd
 {
 	DECLARE_DYNAMIC(CToolTip)
 

@@ -6,10 +6,6 @@
 #include "MyRainmeter.h"
 #include "MyRainmeterDoc.h"
 
-#include "Corner.h"
-#include "VRuler.h"
-#include "HRuler.h"
-
 #include "ChildFrm.h"
 
 #ifdef _DEBUG

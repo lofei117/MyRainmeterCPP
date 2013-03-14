@@ -3,15 +3,6 @@
 
 #include "ViewTree.h"
 
-class CKitToolBar : public CMFCToolBar
-{
-	virtual void OnUpdateCmdUI(CFrameWnd* /*pTarget*/, BOOL bDisableIfNoHndler)
-	{
-		CMFCToolBar::OnUpdateCmdUI((CFrameWnd*) GetOwner(), bDisableIfNoHndler);
-	}
-
-	virtual BOOL AllowShowOnList() const { return FALSE; }
-};
 
 class CKitView : public CDockablePane
 {
@@ -21,14 +12,19 @@ public:
 
 	void AdjustLayout();
 	void OnChangeVisualStyle();
+	CXTPTaskPanel* GetTaskPanel();
 
 protected:
-	CKitToolBar m_wndToolBar;
-	CViewTree m_wndKitView;
 	CImageList m_KitViewImages;
 	UINT m_nCurrSort;
+	CXTPTaskPanel	  m_wndTaskPanel;	// 生成ToolBox效果的CXTPTaskPanel类
 
-	void FillKitView();
+	
+
+protected:
+	//BOOL CreateTaskPanel();
+	void ResetToolboxItems();
+	CXTPTaskPanelGroup* CreateToolboxGroup(UINT nID);
 
 	// 重写
 public:

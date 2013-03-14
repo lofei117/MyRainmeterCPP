@@ -48,6 +48,10 @@ BEGIN_MESSAGE_MAP(CMyRainmeterGraphView, CScrollView)
 	ON_WM_RBUTTONUP()
 	ON_COMMAND(ID_VIEW_CODE, &CMyRainmeterGraphView::OnViewCode)
 	ON_WM_MOUSEMOVE()
+//	ON_WM_PAINT()
+	ON_WM_PAINT()
+//	ON_WM_PAINT()
+ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 // CMyRainmeterGraphView 构造/析构
@@ -61,12 +65,19 @@ CMyRainmeterGraphView::CMyRainmeterGraphView()
 	int cx = GetSystemMetrics(SM_CXFULLSCREEN);
 	int cy = GetSystemMetrics(SM_CYFULLSCREEN);
 	m_DesktopSize = CSize(cx, cy);
+
+	m_imageManager.SetIcons(IDB_TRASH, 0, 0, CSize(48, 48));
+		
 }
 
 CMyRainmeterGraphView::~CMyRainmeterGraphView()
 {
 	//m_BackgroundImage.Destroy();
 	m_BrushBackGround.DeleteObject();
+	for (int i = 0; i < GetDocument()->m_arrItems.GetSize(); i++)
+	{
+		GetDocument()->m_arrItems[i]->InternalRelease();
+	}
 }
 
 BOOL CMyRainmeterGraphView::PreCreateWindow(CREATESTRUCT& cs)
@@ -86,49 +97,105 @@ void CMyRainmeterGraphView::OnDraw(CDC* pDC)
 	if (!pDoc)
 		return;
 
-	// TODO: 在此处为本机数据添加绘制代码
-	//设置背景图片
-	//CPaintDC dc(this);
-	//CImage nImage;
-	//nImage.Load(pDoc->systemBgPath);//加载图片
-	//HBITMAP hBitmap=nImage.Detach();//获得图片句柄用以转换
-	//CBitmap m_bmpBK;
-	//m_bmpBK.DeleteObject();
-	//m_bmpBK.Attach(hBitmap);//转换为CBitmap对象
-	//CRect rect;
-	//GetClientRect(&rect);//获得目标尺寸，即窗口客户区的上左下右坐标
-	//BITMAP bitMap;//位图结构体
-	//m_bmpBK.GetBitmap(&bitMap);//传递指针
-	//CDC dcMem;//目标DC
-	//dcMem.CreateCompatibleDC(&dc);//创建与dc兼容的内存DC
-	//dcMem.SelectObject(&m_bmpBK);//将位图对象m_bmpBK载入内存DC
-	//dc.StretchBlt(0,0,rect.Width(),rect.Height(),&dcMem,0,0,bitMap.bmWidth,bitMap.bmHeight,SRCCOPY);
-	//pDC->SetStretchBltMode(STRETCH_HALFTONE); 
-	//pDC->StretchBlt(0,0,rect.Width(),rect.Height(),&dcMem,0,0,bitMap.bmWidth,bitMap.bmHeight,SRCCOPY);	
+	CDC dc;
+	CDC* pDrawDC = pDC;
+	CBitmap bitmap;
+	CBitmap* pOldBitmap = 0;
 
-	//获取屏幕大小 包括任务栏
+	// only paint the rect that needs repainting
+	CRect client;
+	pDC->GetClipBox(client);
+	CRect rect = client;
+	//DocToClient(rect);
+
+	//if (!pDC->IsPrinting())
+	//{
+	//	// draw to offscreen bitmap for fast looking repaints
+	//	if (dc.CreateCompatibleDC(pDC))
+	//	{
+	//		if (bitmap.CreateCompatibleBitmap(pDC, rect.Width(), rect.Height()))
+	//		{
+	//			OnPrepareDC(&dc, NULL);
+	//			pDrawDC = &dc;
+
+	//			// offset origin more because bitmap is just piece of the whole drawing
+	//			dc.OffsetViewportOrg(-rect.left, -rect.top);
+	//			pOldBitmap = dc.SelectObject(&bitmap);
+	//			dc.SetBrushOrg(rect.left % 8, rect.top % 8);
+
+	//			// might as well clip to the same rectangle
+	//			dc.IntersectClipRect(client);
+	//		}
+	//	}
+	//}
+
+	// paint background
+
+	if (!pDC->IsPrinting())
+		DrawBackground(pDC);
+
+	pDoc->Draw(pDrawDC, this);
+
+	if (pDrawDC != pDC)
+	{
+		pDC->SetViewportOrg(0, 0);
+		pDC->SetWindowOrg(0,0);
+		pDC->SetMapMode(MM_TEXT);
+		dc.SetViewportOrg(0, 0);
+		dc.SetWindowOrg(0,0);
+		dc.SetMapMode(MM_TEXT);
+		pDC->BitBlt(rect.left, rect.top, rect.Width(), rect.Height(), &dc, 0, 0, SRCCOPY);
+		dc.SelectObject(pOldBitmap);
+	}
+	
+}
+
+void CMyRainmeterGraphView::DrawBackground( CDC* pDC )
+{
+	CMyRainmeterDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
 	// 当且仅当图片未加载时加载
 	if(m_BackgroundImage.IsNull())
 		m_BackgroundImage.Load(pDoc->systemBgPath);
 	if(!m_BackgroundImage.IsNull())
-		m_BackgroundImage.Draw(pDC->m_hDC,0,0, m_DesktopSize.cx, m_DesktopSize.cy);
-	else
-		AfxMessageBox(_T("桌面背景加载失败！请重新设置背景后试试，如果问题仍然存在，请与我联系~~"));
-
-	CRect rect;
-	GetClientRect(&rect);
-	SetScrollSizes(MM_TEXT, m_DesktopSize);    
+	{
+	//	m_BackgroundImage.Draw(pDC->m_hDC,0,0, m_DesktopSize.cx, m_DesktopSize.cy);
+		HBITMAP hBitmap=m_BackgroundImage.Detach();//获得图片句柄用以转换
+		CBitmap m_bmpBK;
+		m_bmpBK.DeleteObject();
+		m_bmpBK.Attach(hBitmap);//转换为CBitmap对象
+		CRect rect;
+		GetClientRect(&rect);//获得目标尺寸，即窗口客户区的上左下右坐标
+		BITMAP bitMap;//位图结构体
+		m_bmpBK.GetBitmap(&bitMap);//传递指针
+		CDC dcMem;//目标DC
+		dcMem.CreateCompatibleDC(pDC);//创建与dc兼容的内存DC
+		dcMem.SelectObject(&m_bmpBK);//将位图对象m_bmpBK载入内存DC
+		//dcMem.SetStretchBltMode(STRETCH_HALFTONE); 
+		//dcMem.StretchBlt(0,0,rect.Width(),rect.Height(),&dcMem,0,0,m_DesktopSize.cx,m_DesktopSize.cy,SRCCOPY);
 		
+		pDC->SetStretchBltMode(STRETCH_HALFTONE); 
+		CPoint point = GetScrollPosition();
+		pDC->StretchBlt(0,0,m_DesktopSize.cx,m_DesktopSize.cy,&dcMem,0,0,bitMap.bmWidth,bitMap.bmHeight,SRCCOPY);
+		//pDC->BitBlt(point.x,point.y,rect.Width(),rect.Height(),&dcMem, point.x,point.y,SRCCOPY);	
+		m_bmpBK.DeleteObject();
+		dcMem.DeleteDC();
+		
+	}
+	else
+		AfxMessageBox(_T("桌面背景加载失败！请重新设置背景后试试，如果问题仍然存在，请与我联系~~"));	
 }
 
 // 
 void CMyRainmeterGraphView::OnInitialUpdate()
 {
 	CScrollView::OnInitialUpdate();
-	
-	/*int cx = GetSystemMetrics(SM_CXFULLSCREEN);
-	int cy = GetSystemMetrics(SM_CYFULLSCREEN);
-	SetScrollSizes(MM_TEXT,CSize(cx, cy)); */
+
+	m_wndDragTarget.Register(this);
+
 	SetScrollSizes(MM_TEXT, m_DesktopSize);  
 	m_pParent = ((CChildFrame*)GetParentFrame());
 	m_pParent->ShowRulers(TRUE);
@@ -243,8 +310,8 @@ void CMyRainmeterGraphView::OnMouseMove(UINT nFlags, CPoint point)
 BOOL CMyRainmeterGraphView::OnEraseBkgnd( CDC* pDC )
 {
 	FillOutsideRect(pDC, &m_BrushBackGround);
-
-	return FALSE;//CScrollView::OnEraseBkgnd(pDC);
+	return TRUE;
+	return FALSE; 
 }
 
 void CMyRainmeterGraphView::OnLButtonDown( UINT nFlags, CPoint point )
@@ -282,5 +349,63 @@ void CMyRainmeterGraphView::UpdateRulersInfo( int nMessage, CPoint ScrollPos, CP
 
 	m_pParent->UpdateRulersInfo(pRulerInfo);
 }
+
+
+
+
+
+DROPEFFECT CMyRainmeterGraphView::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	if (!pDataObject || !pDataObject->IsDataAvailable(CXTPTaskPanel::GetClipboardFormat()))
+		return DROPEFFECT_NONE;
+	return DROPEFFECT_COPY;
+//	return CScrollView::OnDragOver(pDataObject, dwKeyState, point);
+}
+
+
+BOOL CMyRainmeterGraphView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	
+	CXTPTaskPanelGroupItem* pItemDrop = (CXTPTaskPanelGroupItem*)CXTPTaskPanelItem::CreateFromOleData(pDataObject);
+
+	if (!pItemDrop)
+		return FALSE;
+
+	ASSERT_KINDOF(CXTPTaskPanelGroupItem, pItemDrop);
+
+	GetDocument()->m_arrItems.Add(pItemDrop);
+	CPoint ScrollPos = this->GetScrollPosition();
+	pItemDrop->SetItemRect(CRect(point.x + ScrollPos.x - 14, point.y + ScrollPos.y - 14, point.x +ScrollPos.x + 14, point.y + ScrollPos.y + 14));
+
+	Invalidate(FALSE);
+
+	return TRUE;
+//	return CScrollView::OnDrop(pDataObject, dropEffect, point);
+}
+
+
+
+BOOL CMyRainmeterGraphView::PtInTrash(CPoint point)
+{
+	CXTPClientRect rc(this);
+	CRect rcTrash(rc.right - 72, rc.bottom - 72, rc.right - 12, rc.bottom - 12);
+
+	return rcTrash.PtInRect(point);
+}
+
+CXTPTaskPanel* CMyRainmeterGraphView::GetTaskPanel()
+{
+	//CWnd* pSplitterWnd = GetParentFrame()->GetDlgItem(IDS_KIT_VIEW);
+	CMainFrame* pMainWnd = (CMainFrame *)AfxGetMainWnd();
+	CKitView* pKitViewPane = pMainWnd->GetKitVew();
+	
+	ASSERT_KINDOF(CKitView, pKitViewPane);
+
+	return (CXTPTaskPanel*)pKitViewPane->GetTaskPanel();
+}
+
+
 
 
