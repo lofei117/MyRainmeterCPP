@@ -58,7 +58,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>
       </AdditionalDependencies>
-      <AdditionalLibraryDirectories>E:\study\myproject\MyRainmeterCPP\MyRainmeter\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -121,10 +121,13 @@
     <None Include="res\MyRainmeterDoc.ico" />
     <None Include="res\output_wnd.ico" />
     <None Include="res\output_wnd_hc.ico" />
+    <None Include="res\png1.png" />
     <None Include="res\properties.bmp" />
     <None Include="res\properties_hc.bmp" />
     <None Include="res\properties_wnd.ico" />
     <None Include="res\properties_wnd_hc.ico" />
+    <None Include="res\rainmeter.bmp" />
+    <None Include="res\rainmeter.png" />
     <None Include="res\ribbon1.mfcribbon-ms" />
     <None Include="res\sort.bmp" />
     <None Include="res\sort_hc.bmp" />
@@ -136,7 +139,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChildFrm.h" />
-    <ClInclude Include="ClassView.h" />
     <ClInclude Include="ConfigParser.h" />
     <ClInclude Include="ConstInfo.h" />
     <ClInclude Include="FileView.h" />
@@ -155,13 +157,18 @@
     <ClInclude Include="MeansureUptime.h" />
     <ClInclude Include="Meter.h" />
     <ClInclude Include="MeterBar.h" />
+    <ClInclude Include="MeterImage.h" />
+    <ClInclude Include="MeterString.h" />
     <ClInclude Include="Mouse.h" />
+    <ClInclude Include="MyPropertyGridProterty.h" />
     <ClInclude Include="MyRainmeter.h" />
     <ClInclude Include="MyRainmeterDoc.h" />
-    <ClInclude Include="MyRainmeterTextView.h" />
     <ClInclude Include="MyRainmeterGraphView.h" />
+    <ClInclude Include="MyRainmeterTextView.h" />
     <ClInclude Include="OutputWnd.h" />
     <ClInclude Include="PropertiesWnd.h" />
+    <ClInclude Include="Rainmeter.h" />
+    <ClInclude Include="RainmeterUtil.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RmControl.h" />
     <ClInclude Include="Ruler.h" />
@@ -172,7 +179,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChildFrm.cpp" />
-    <ClCompile Include="ClassView.cpp" />
     <ClCompile Include="ConfigParser.cpp" />
     <ClCompile Include="FileView.cpp" />
     <ClCompile Include="KitView.cpp" />
@@ -190,13 +196,18 @@
     <ClCompile Include="MeansureUptime.cpp" />
     <ClCompile Include="Meter.cpp" />
     <ClCompile Include="MeterBar.cpp" />
+    <ClCompile Include="MeterImage.cpp" />
+    <ClCompile Include="MeterString.cpp" />
     <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="MyPropertyGridProterty.cpp" />
     <ClCompile Include="MyRainmeter.cpp" />
     <ClCompile Include="MyRainmeterDoc.cpp" />
-    <ClCompile Include="MyRainmeterTextView.cpp" />
     <ClCompile Include="MyRainmeterGraphView.cpp" />
+    <ClCompile Include="MyRainmeterTextView.cpp" />
     <ClCompile Include="OutputWnd.cpp" />
     <ClCompile Include="PropertiesWnd.cpp" />
+    <ClCompile Include="Rainmeter.cpp" />
+    <ClCompile Include="RainmeterUtil.cpp" />
     <ClCompile Include="RmControl.cpp" />
     <ClCompile Include="Ruler.cpp" />
     <ClCompile Include="stdafx.cpp">

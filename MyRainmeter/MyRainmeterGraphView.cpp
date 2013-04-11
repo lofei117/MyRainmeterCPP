@@ -12,7 +12,10 @@
 #include "MyRainmeterDoc.h"
 #include "MyRainmeterGraphView.h"
 #include "Meter.h"
+#include "MeterBar.h"
+#include "MeterImage.h"
 #include "MainFrm.h"
+#include "MeterString.h"
 
 
 #ifdef _DEBUG
@@ -48,10 +51,7 @@ BEGIN_MESSAGE_MAP(CMyRainmeterGraphView, CScrollView)
 	ON_WM_RBUTTONUP()
 	ON_COMMAND(ID_VIEW_CODE, &CMyRainmeterGraphView::OnViewCode)
 	ON_WM_MOUSEMOVE()
-//	ON_WM_PAINT()
-	ON_WM_PAINT()
-//	ON_WM_PAINT()
-ON_WM_PAINT()
+	ON_COMMAND(ID_EDIT_PROPERTIES, &CMyRainmeterGraphView::OnEditProperties)
 END_MESSAGE_MAP()
 
 // CMyRainmeterGraphView 构造/析构
@@ -64,20 +64,23 @@ CMyRainmeterGraphView::CMyRainmeterGraphView()
 	m_bShowRulers       = TRUE;
 	int cx = GetSystemMetrics(SM_CXFULLSCREEN);
 	int cy = GetSystemMetrics(SM_CYFULLSCREEN);
-	m_DesktopSize = CSize(cx, cy);
+	m_ViewSize = CSize(cx, cy);
 
 	m_imageManager.SetIcons(IDB_TRASH, 0, 0, CSize(48, 48));
-		
+	m_bDragging = FALSE;
 }
+	
+CSize CMyRainmeterGraphView::GetViewSize()
+{
+	return m_ViewSize;
+}
+
 
 CMyRainmeterGraphView::~CMyRainmeterGraphView()
 {
 	//m_BackgroundImage.Destroy();
 	m_BrushBackGround.DeleteObject();
-	for (int i = 0; i < GetDocument()->m_arrItems.GetSize(); i++)
-	{
-		GetDocument()->m_arrItems[i]->InternalRelease();
-	}
+	
 }
 
 BOOL CMyRainmeterGraphView::PreCreateWindow(CREATESTRUCT& cs)
@@ -97,57 +100,33 @@ void CMyRainmeterGraphView::OnDraw(CDC* pDC)
 	if (!pDoc)
 		return;
 
-	CDC dc;
+	//CDC dc;
 	CDC* pDrawDC = pDC;
-	CBitmap bitmap;
-	CBitmap* pOldBitmap = 0;
 
 	// only paint the rect that needs repainting
 	CRect client;
 	pDC->GetClipBox(client);
 	CRect rect = client;
-	//DocToClient(rect);
-
-	//if (!pDC->IsPrinting())
-	//{
-	//	// draw to offscreen bitmap for fast looking repaints
-	//	if (dc.CreateCompatibleDC(pDC))
-	//	{
-	//		if (bitmap.CreateCompatibleBitmap(pDC, rect.Width(), rect.Height()))
-	//		{
-	//			OnPrepareDC(&dc, NULL);
-	//			pDrawDC = &dc;
-
-	//			// offset origin more because bitmap is just piece of the whole drawing
-	//			dc.OffsetViewportOrg(-rect.left, -rect.top);
-	//			pOldBitmap = dc.SelectObject(&bitmap);
-	//			dc.SetBrushOrg(rect.left % 8, rect.top % 8);
-
-	//			// might as well clip to the same rectangle
-	//			dc.IntersectClipRect(client);
-	//		}
-	//	}
-	//}
-
+	
 	// paint background
 
 	if (!pDC->IsPrinting())
 		DrawBackground(pDC);
 
-	pDoc->Draw(pDrawDC, this);
+	pDoc->Draw(pDrawDC, GetTaskPanel());
 
-	if (pDrawDC != pDC)
+
+	CRect rcTrash(rect.right - 72, rect.bottom - 72, rect.right - 12, rect.bottom - 12);
+//	pDC->FillSolidRect(rcTrash, GetSysColor(COLOR_3DFACE));
+	pDC->Draw3dRect(rcTrash, GetSysColor(COLOR_3DHIGHLIGHT), GetSysColor(COLOR_3DSHADOW));
+
+	CXTPImageManagerIcon* pImage = m_imageManager.GetImage(0, 48);
+	if (pImage)
 	{
-		pDC->SetViewportOrg(0, 0);
-		pDC->SetWindowOrg(0,0);
-		pDC->SetMapMode(MM_TEXT);
-		dc.SetViewportOrg(0, 0);
-		dc.SetWindowOrg(0,0);
-		dc.SetMapMode(MM_TEXT);
-		pDC->BitBlt(rect.left, rect.top, rect.Width(), rect.Height(), &dc, 0, 0, SRCCOPY);
-		dc.SelectObject(pOldBitmap);
+		CPoint ptImage((rcTrash.right + rcTrash.left - 48) / 2, (rcTrash.top + rcTrash.bottom - 48) / 2);
+		pImage->Draw(pDC, ptImage, pImage->GetIcon());
 	}
-	
+		
 }
 
 void CMyRainmeterGraphView::DrawBackground( CDC* pDC )
@@ -159,7 +138,7 @@ void CMyRainmeterGraphView::DrawBackground( CDC* pDC )
 
 	// 当且仅当图片未加载时加载
 	if(m_BackgroundImage.IsNull())
-		m_BackgroundImage.Load(pDoc->systemBgPath);
+		m_BackgroundImage.Load(pDoc->m_SystemBgPath);
 	if(!m_BackgroundImage.IsNull())
 	{
 	//	m_BackgroundImage.Draw(pDC->m_hDC,0,0, m_DesktopSize.cx, m_DesktopSize.cy);
@@ -179,11 +158,10 @@ void CMyRainmeterGraphView::DrawBackground( CDC* pDC )
 		
 		pDC->SetStretchBltMode(STRETCH_HALFTONE); 
 		CPoint point = GetScrollPosition();
-		pDC->StretchBlt(0,0,m_DesktopSize.cx,m_DesktopSize.cy,&dcMem,0,0,bitMap.bmWidth,bitMap.bmHeight,SRCCOPY);
+		pDC->StretchBlt(0,0,m_ViewSize.cx,m_ViewSize.cy,&dcMem,0,0,bitMap.bmWidth,bitMap.bmHeight,SRCCOPY);
 		//pDC->BitBlt(point.x,point.y,rect.Width(),rect.Height(),&dcMem, point.x,point.y,SRCCOPY);	
 		m_bmpBK.DeleteObject();
 		dcMem.DeleteDC();
-		
 	}
 	else
 		AfxMessageBox(_T("桌面背景加载失败！请重新设置背景后试试，如果问题仍然存在，请与我联系~~"));	
@@ -194,12 +172,20 @@ void CMyRainmeterGraphView::OnInitialUpdate()
 {
 	CScrollView::OnInitialUpdate();
 
-	m_wndDragTarget.Register(this);
-
-	SetScrollSizes(MM_TEXT, m_DesktopSize);  
-	m_pParent = ((CChildFrame*)GetParentFrame());
-	m_pParent->ShowRulers(TRUE);
+	m_wndDragTarget.Register(this);		// 注册COleDataObject对象以实现拖拽
+	
+	SetScrollSizes(MM_TEXT, m_ViewSize);		//滚动区域
+	m_pParent = ((CChildFrame*)GetParentFrame());	//父窗口
+	m_pParent->ShowRulers(TRUE);				//开启标尺
 	OnUpdate(NULL, 0, NULL);
+
+	EnableToolTips(TRUE);
+	m_ToolTip.Create(this); 
+	m_ToolTip.Activate(TRUE);
+//	m_ToolTip.AddTool(this,_T("提示信息!")); 	
+	m_ToolTip.SetDelayTime(TTDT_INITIAL, 100);// 100ms
+	m_ToolTip.SetDelayTime(TTDT_AUTOPOP, 1000*4);// 4s
+	m_ToolTip.SetDelayTime(TTDT_RESHOW, 100);// 100ms
 }
 
 
@@ -238,7 +224,7 @@ void CMyRainmeterGraphView::OnRButtonUp(UINT /* nFlags */, CPoint point)
 void CMyRainmeterGraphView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 {
 #ifndef SHARED_HANDLERS
-	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
+	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_GRAPH, point.x, point.y, this, TRUE);
 #endif
 }
 
@@ -274,12 +260,20 @@ void CMyRainmeterGraphView::OnViewCode()
 	GetDocument()->SwitchViewCodeFrame();	
 }
 
+void CMyRainmeterGraphView::OnEditProperties()
+{
+	// TODO: 在此添加命令处理程序代码
+	CMainFrame* pMain = (CMainFrame*)AfxGetMainWnd();
+	//pMain->GetPropWnd()->Slide(TRUE);
+	pMain->GetPropWnd()->ShowPane(TRUE, FALSE, TRUE);
+	
+}
 
 void CMyRainmeterGraphView::OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/)
 {
 	// TODO: 在此添加专用代码和/或调用基类
 	
-	SetScrollSizes(MM_TEXT, m_DesktopSize);   
+	SetScrollSizes(MM_TEXT, m_ViewSize);   
 	UpdateRulersInfo(RW_POSITION, GetScrollPosition());
 	Invalidate();	
 }
@@ -309,15 +303,59 @@ void CMyRainmeterGraphView::OnMouseMove(UINT nFlags, CPoint point)
 
 BOOL CMyRainmeterGraphView::OnEraseBkgnd( CDC* pDC )
 {
-	FillOutsideRect(pDC, &m_BrushBackGround);
+	//FillOutsideRect(pDC, &m_BrushBackGround);
 	return TRUE;
-	return FALSE; 
 }
 
 void CMyRainmeterGraphView::OnLButtonDown( UINT nFlags, CPoint point )
 {
 	// TODO:
-	CScrollView::OnLButtonDown(nFlags, point);
+	
+	CPoint relPoint = GetScrollPosition()+point;
+	int nHit = HitTest(relPoint);
+	if(nHit<0)
+	{
+		GetDocument()->m_pCurRmCtrl = NULL;
+		CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+		CPropertiesWnd* pPropWnd = pMainFrm->GetPropWnd();
+		pPropWnd->SetCurObjProperties(NULL);
+		return;
+	}
+	CRmControl* pRmCtrl = (nHit >= 0? GetDocument()->m_arrItems[nHit]: NULL);
+	if(!pRmCtrl)
+		return;
+
+	CXTPTaskPanelGroupItem* pItem = pRmCtrl->m_pItem;
+
+	if (!pItem)
+		return;
+
+	GetDocument()->m_pCurRmCtrl = pRmCtrl;
+	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+	CPropertiesWnd* pPropWnd = pMainFrm->GetPropWnd();
+	pPropWnd->SetCurObjProperties(pRmCtrl);
+
+
+	COleDataSource ds;
+	if (!pItem->PrepareDrag(ds))
+		return;
+
+	m_bDragging = TRUE;
+
+	DROPEFFECT dropEffect = ds.DoDragDrop(DROPEFFECT_COPY|DROPEFFECT_MOVE);
+
+	m_bDragging = FALSE;
+
+	/*if (dropEffect == DROPEFFECT_MOVE)
+	{
+		pItem->InternalRelease();
+		GetDocument()->RemoveAt(nHit);
+		GetDocument()->m_pCurRmCtrl = NULL;
+		GetDocument()->m_arrItems.RemoveAt(nHit);
+	}*/
+
+	Invalidate(FALSE);
+	//CScrollView::OnLButtonDown(nFlags, point);
 }
 
 void CMyRainmeterGraphView::OnVScroll( UINT nSBCode, UINT nPos, CScrollBar* pScrollBar )
@@ -344,30 +382,54 @@ void CMyRainmeterGraphView::UpdateRulersInfo( int nMessage, CPoint ScrollPos, CP
 	pRulerInfo.uMessage    = nMessage;
 	pRulerInfo.ScrollPos   = ScrollPos;
 	pRulerInfo.Pos         = Pos;
-	pRulerInfo.DocSize     = m_DesktopSize;
+	pRulerInfo.DocSize     = m_ViewSize;
 	pRulerInfo.fZoomFactor = 1;
 
 	m_pParent->UpdateRulersInfo(pRulerInfo);
 }
 
 
-
-
-
 DROPEFFECT CMyRainmeterGraphView::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
 {
+	UpdateRulersInfo(RW_POSITION, GetScrollPosition(), point);
 	// TODO: 在此添加专用代码和/或调用基类
 	if (!pDataObject || !pDataObject->IsDataAvailable(CXTPTaskPanel::GetClipboardFormat()))
 		return DROPEFFECT_NONE;
-	return DROPEFFECT_COPY;
+	
+	if (!m_bDragging || ((dwKeyState & MK_CONTROL) == MK_CONTROL))
+		return DROPEFFECT_COPY;
+
+	if (PtInTrash(point))
+	{
+		return DROPEFFECT_MOVE;
+	}
+	CRmControl* pCurRmCtrl = GetDocument()->m_pCurRmCtrl;
+	if(pCurRmCtrl != NULL)
+	{
+		/*CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+		CPropertiesWnd* pPropWnd = pMainFrm->GetPropWnd();
+		pPropWnd->SetCurObjProperties(pCurRmCtrl);*/
+		pCurRmCtrl->UpdateProperties();
+	}
+
+	return DROPEFFECT_MOVE;
+	
 //	return CScrollView::OnDragOver(pDataObject, dwKeyState, point);
 }
 
 
 BOOL CMyRainmeterGraphView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point)
 {
+	CMyRainmeterDoc *pDoc = GetDocument();
+	if(!pDoc)return FALSE;
 	// TODO: 在此添加专用代码和/或调用基类
-	
+	if (PtInTrash(point))
+	{
+		pDoc->Remove(GetDocument()->m_pCurRmCtrl);
+		pDoc->m_pCurRmCtrl = NULL;
+		pDoc->UpdateAllViews(this);
+		return TRUE;
+	}
 	CXTPTaskPanelGroupItem* pItemDrop = (CXTPTaskPanelGroupItem*)CXTPTaskPanelItem::CreateFromOleData(pDataObject);
 
 	if (!pItemDrop)
@@ -375,11 +437,60 @@ BOOL CMyRainmeterGraphView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropE
 
 	ASSERT_KINDOF(CXTPTaskPanelGroupItem, pItemDrop);
 
-	GetDocument()->m_arrItems.Add(pItemDrop);
+	CString itemCaption = pItemDrop->GetCaption();
+	
+	
 	CPoint ScrollPos = this->GetScrollPosition();
-	pItemDrop->SetItemRect(CRect(point.x + ScrollPos.x - 14, point.y + ScrollPos.y - 14, point.x +ScrollPos.x + 14, point.y + ScrollPos.y + 14));
+	CRect itemRect = CRect(point.x + ScrollPos.x - 16, point.y + ScrollPos.y - 16, point.x +ScrollPos.x + 16, point.y + ScrollPos.y + 16);
+	pItemDrop->SetItemRect(itemRect);
+	
+//	pItemDrop->SetTooltip(itemCaption);
+	m_ToolTip.AddTool(this, itemCaption, itemRect, 1);
+
+	CRmControl* pRmCtrl;
+	if (dropEffect == DROPEFFECT_COPY)
+	{	
+		if (itemCaption.CompareNoCase(_T("Bar")) == 0)
+		{
+			pRmCtrl = new CMeterBar(pItemDrop);
+		}
+		else if (itemCaption.CompareNoCase(_T("Image")) == 0)
+		{
+			CMeterImage* pMeterImage = new CMeterImage(pItemDrop, this);
+			pMeterImage->SetMeterName(_T("Image1"));
+			pRmCtrl = pMeterImage;
+			//pRmCtrl = new CMeterImage(pItemDrop, this);					
+		} 
+		else if (itemCaption.CompareNoCase(_T("String")) == 0)
+		{
+			CMeterString* pMeterString = new CMeterString(pItemDrop, this);
+			pMeterString->SetMeterName(_T("String1"));
+			pRmCtrl = pMeterString;
+		} 
+		else
+		{
+			pRmCtrl = new CRmControl(pItemDrop, this);
+		}
+		pDoc->m_pCurRmCtrl = pRmCtrl;
+		pDoc->Add(pRmCtrl);
+	}
+	else if (dropEffect == DROPEFFECT_MOVE)
+	{
+		pRmCtrl = pDoc->m_pCurRmCtrl;
+		pRmCtrl->m_pItem = pItemDrop;
+		pRmCtrl->UpdateProperties();
+	}
+	else
+	{
+		return TRUE;
+	}
+		
+	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+	CPropertiesWnd* pPropWnd = pMainFrm->GetPropWnd();
+	pPropWnd->SetCurObjProperties(pRmCtrl);
 
 	Invalidate(FALSE);
+	pDoc->UpdateAllViews(this);
 
 	return TRUE;
 //	return CScrollView::OnDrop(pDataObject, dropEffect, point);
@@ -389,9 +500,13 @@ BOOL CMyRainmeterGraphView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropE
 
 BOOL CMyRainmeterGraphView::PtInTrash(CPoint point)
 {
+	CPaintDC dc(this);
+	CRect client;
+	dc.GetClipBox(client);
+	//CRect rc = client;
 	CXTPClientRect rc(this);
 	CRect rcTrash(rc.right - 72, rc.bottom - 72, rc.right - 12, rc.bottom - 12);
-
+	
 	return rcTrash.PtInRect(point);
 }
 
@@ -404,6 +519,31 @@ CXTPTaskPanel* CMyRainmeterGraphView::GetTaskPanel()
 	ASSERT_KINDOF(CKitView, pKitViewPane);
 
 	return (CXTPTaskPanel*)pKitViewPane->GetTaskPanel();
+}
+
+int CMyRainmeterGraphView::HitTest( CPoint point ) const
+{	
+	for (int i = (int)GetDocument()->m_arrItems.GetSize() - 1; i >= 0; i--)
+	{
+		CRmControl* pRmCtrl = GetDocument()->m_arrItems[i];
+		CXTPTaskPanelGroupItem* pItem=pRmCtrl->m_pItem;
+
+		if (pItem->GetItemRect().PtInRect(point))
+			return i;
+	}
+	return -1;
+}
+
+
+
+BOOL CMyRainmeterGraphView::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	{
+		m_ToolTip.RelayEvent(pMsg);
+	}
+	
+	return CScrollView::PreTranslateMessage(pMsg);
 }
 
 

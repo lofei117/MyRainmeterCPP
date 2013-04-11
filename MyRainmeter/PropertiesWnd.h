@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "RmControl.h"
+
 class CPropertiesToolBar : public CMFCToolBar
 {
 public:
@@ -22,6 +24,7 @@ public:
 
 // 特性
 public:
+	bool isExpandAll;
 	void SetVSDotNetLook(BOOL bSet)
 	{
 		m_wndPropList.SetVSDotNetLook(bSet);
@@ -38,6 +41,17 @@ protected:
 public:
 	virtual ~CPropertiesWnd();
 
+public:
+	CMyRainmeterDoc* GetDocument();
+	void InitPropList();	
+	void LoadRainmeterSection();
+	void LoadMeterDataSection();
+
+	void SetCurObjProperties(CRmControl* pRmCtrl);		// 设置当前选中对象的属性
+
+protected:
+	void SetPropListFont();
+
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -51,10 +65,10 @@ protected:
 	afx_msg void OnUpdateProperties2(CCmdUI* pCmdUI);
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
+	afx_msg LRESULT OnPropertyChanged (WPARAM,LPARAM);
 
 	DECLARE_MESSAGE_MAP()
 
-	void InitPropList();
-	void SetPropListFont();
+	
 };
 

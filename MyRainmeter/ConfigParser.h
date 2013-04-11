@@ -36,6 +36,8 @@ protected:
 
 // public methods
 public:
+	//CString GetStringFromText(CString sectin, CString key, CString defValue, CString srcText);
+
 	unordered_set<wstring> GetSections();
 	unordered_map<wstring, wstring> GetBuiltIntVariables();
 	unordered_map<wstring, wstring> GetVariables();
@@ -43,26 +45,28 @@ public:
 	void SetVariable(std::wstring strVariable, const std::wstring& strValue);
 	void SetBuiltInVariables(std::wstring strVariable, const std::wstring& strValue);
 	// GetValue
-	wstring GetValue(LPCTSTR section, LPCTSTR key, LPCTSTR defValue);
+	CString GetValue(LPCTSTR section, LPCTSTR key, LPCTSTR defValue);
 	// Get value as string
-	std::wstring GetValueString(LPCTSTR section, LPCTSTR key, LPCTSTR defValue);
+	CString GetValueString(LPCTSTR section, LPCTSTR key, LPCTSTR defValue);
+	
 	// Get value as integer
 	int ReadInt(LPCTSTR section, LPCTSTR key, int defValue);
 	uint32_t ReadUInt(LPCTSTR section, LPCTSTR key, uint32_t defValue);
 	uint64_t ReadUInt64(LPCTSTR section, LPCTSTR key, uint64_t defValue);
 
-	void AddSection(wstring section);
-	void SetValue(wstring section, wstring key, wstring value);
-	void SetComment(wstring section, wstring key, wstring comment);
-	void DelSection(wstring section);
-	void DelValue(wstring section, wstring key);
-	void DelComment(wstring section, wstring key);
+	// Write value to config
+	void SetValueString(LPCTSTR section, LPCTSTR key, LPCTSTR value);
+	void AddSection(LPCTSTR section);	
+	void SetComment(LPCTSTR section, LPCTSTR key, LPCTSTR comment);
+	void DelSection(LPCTSTR section);
+	void DelValueString(LPCTSTR section, LPCTSTR key);
+	void DelComment(LPCTSTR section, LPCTSTR key);
 	void CleanConfig();
 
 	unordered_map<std::wstring, CMeter*> GetMeterList();
-	unordered_map<std::wstring, CMeansure*> GetMeansureLIst();
+	unordered_map<std::wstring, CMeansure*> GetMeansureList();
 	CMeter* GetMeter(std::wstring meterName);
-	//CString GetValue(CString section, CString key, CString defaultValue);
+	CString GetValue(CString section, CString key, CString defaultValue);
 	bool SetValue(CString section, CString key);
 
 // private methods

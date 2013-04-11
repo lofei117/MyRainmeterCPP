@@ -17,7 +17,15 @@ enum ToolTipIcon
 
 enum MeterType
 {
-	
+	Bar=1,
+	Bitmap,
+	Button,
+	Histogram,
+	Image,
+	Line,
+	Rotator,
+	Roundline,
+	String
 };
 
 enum MeansureType
@@ -33,5 +41,4 @@ enum ImageCropOrigin
 	BottomLeft,
 	Center
 };
-
 

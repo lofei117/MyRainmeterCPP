@@ -129,18 +129,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	m_wndFileView.EnableDocking(CBRS_ALIGN_ANY);
-	m_wndClassView.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndKitView.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndFileView);
-	CDockablePane* pTabbedBar = NULL;
-	m_wndClassView.AttachToTabWnd(&m_wndFileView, DM_SHOW, TRUE, &pTabbedBar);
 	CDockablePane* pTabbedBarForKitView = NULL;
 	m_wndKitView.AttachToTabWnd(&m_wndFileView, DM_SHOW, TRUE, &pTabbedBarForKitView);
 	m_wndOutput.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndOutput);
 	m_wndProperties.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndProperties);
-
+	
 
 	// 启用增强的窗口管理对话框
 	EnableWindowsDialog(ID_WINDOW_MANAGER, ID_WINDOW_MANAGER, TRUE);
@@ -164,7 +161,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// TODO: 定义您自己的基本命令，确保每个下拉菜单至少有一个基本命令。
 	CList<UINT, UINT> lstBasicCommands;
 
-	//lstBasicCommands.AddTail(ID_FILE_NEW);
+	lstBasicCommands.AddTail(ID_FILE_NEW);
 	lstBasicCommands.AddTail(ID_FILE_OPEN);
 	lstBasicCommands.AddTail(ID_FILE_NEW_CONFIG);
 	lstBasicCommands.AddTail(ID_FILE_NEW_SKIN);
@@ -211,17 +208,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 BOOL CMainFrame::CreateDockingWindows()
 {
 	BOOL bNameValid;
-
-	// 创建类视图
-	CString strClassView;
-	bNameValid = strClassView.LoadString(IDS_CLASS_VIEW);
-	ASSERT(bNameValid);
-	if (!m_wndClassView.Create(strClassView, this, CRect(0, 0, 200, 200), TRUE, ID_VIEW_CLASSVIEW, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_LEFT | CBRS_FLOAT_MULTI))
-	{
-		TRACE0("未能创建“类视图”窗口\n");
-		return FALSE; // 未能创建
-	}
-
+	
 	//Create kit view
 	CString strKitView;
 	bNameValid = strKitView.LoadString(IDS_KIT_VIEW);
@@ -261,7 +248,7 @@ BOOL CMainFrame::CreateDockingWindows()
 		TRACE0("未能创建“属性”窗口\n");
 		return FALSE; // 未能创建
 	}
-
+	
 	SetDockingWindowIcons(theApp.m_bHiColorIcons);
 	return TRUE;
 }
@@ -270,9 +257,7 @@ void CMainFrame::SetDockingWindowIcons(BOOL bHiColorIcons)
 {
 	HICON hFileViewIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_FILE_VIEW_HC : IDI_FILE_VIEW), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
 	m_wndFileView.SetIcon(hFileViewIcon, FALSE);
-
-	HICON hClassViewIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_CLASS_VIEW_HC : IDI_CLASS_VIEW), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
-	m_wndClassView.SetIcon(hClassViewIcon, FALSE);
+	
 
 	HICON hKitViewIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_KIT_VIEW_HC : IDI_KIT_VIEW), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
 	m_wndKitView.SetIcon(hKitViewIcon, FALSE);
@@ -453,4 +438,9 @@ void CMainFrame::AddStrLogToOutputWnd( CString str )
 CKitView* CMainFrame::GetKitVew()
 {
 	return &(this->m_wndKitView);
+}
+
+CPropertiesWnd* CMainFrame::GetPropWnd()
+{
+	return &(this->m_wndProperties);
 }

@@ -19,15 +19,48 @@ private:
 
 // protected attributes
 protected:	
-	int m_X;		
-	int m_Y;
-	int m_W;
-	int m_H;
-	int m_Hidden;
-	CString m_MeterName;
+	
+	// General Options
+	CString m_MeterName;	// meter name
+	CString m_MeterStyle;
+	CString m_MeansureName;
+	int m_X;		// location.x
+	int m_Y;		// location.y
+	int m_W;		// width
+	int m_H;		// height 
+	CString m_Hidden;	// property of hidden
+	int m_UpdateDivider;	// update frequency of the meter
+
+	CString m_OnUpdateAction;	// Action to execute when update the meter
+	CString m_SolidColor;
+	int m_GradientAngle;
+	CString m_BevelType;
+	CString m_AntiAlias;
+	CString m_DynamicVariables;
+	CString m_TransfromationMatrix;
+
+	// General Image Options
+
+	CString m_ImageCrop;
+	CString m_Greyscale;//default 0£»
+	CString m_ImageTint;// default 255,255,255,255
+	int m_ImageAlpha;//default 255
+	CString m_ImageFlip;// Default: None
+	float m_ImageRotate;//default 0.0
+	CString m_Tile;		// default 0;
+	CString m_ColorMatrix;
+	
+
+	// Tooltip Options
+	CString m_ToolTipText;
+	CString m_ToolTipTitle;
+	CString m_ToolTipIcon;
+	CString m_ToolTipType;
+	int m_ToolTipWidth;
+	CString m_ToolTipHidden;	
 	
 	CMeter* m_RelativeMeter;
-	CMeter* m_MeterStyle;
+	CMeter* m_MeterStyleList;		// under construction
 
 // public methods
 public:
@@ -50,6 +83,11 @@ public:
 	void SetH(int h){ m_H = h; }
 	// Get H
 	int GetH(){ return m_H; }
+
+	// Set UpdateDivider
+	void SetUpdateDivider(int updateDividert){	m_UpdateDivider = updateDividert;	}
+	// Get UpdateDivider
+	int GetUpdateDivider(){	return m_UpdateDivider;	}
 	
 	// Set meter's name
 	void SetMeterName(CString meterName){ m_MeterName = meterName; }
@@ -57,17 +95,17 @@ public:
 	CString GetMeterName(){ return m_MeterName; }
 
 	// Set visible
-	void SetHidden(bool hidden){ m_Hidden = hidden; }
+	void SetHidden(CString hidden){ m_Hidden = hidden; }
 	// Get visible
-	bool IsHidden(){ return m_Hidden; }
+	CString IsHidden(){ return m_Hidden; }
 	
 	// Set MeterStyle
-	void SetMeterStyle(CMeter* meterStyle){ m_MeterStyle = meterStyle; }
+	void SetMeterStyle(CMeter* meterStyle){ m_MeterStyleList = meterStyle; }
 	// Get MeterStyle
-	CMeter* GetMeterStyle(){ return m_MeterStyle; }
+	CMeter* GetMeterStyle(){ return m_MeterStyleList; }
 
 	// Get Meter type, virtual function. CMeter can not be instantiated
-	virtual CString GetMeterType()=0;
+	virtual int GetMeterType()=0;
 
 // private methods
 private:

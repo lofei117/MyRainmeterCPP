@@ -14,6 +14,7 @@
 
 #include "MyRainmeterTextView.h"
 
+
 #include <propkey.h>
 
 #ifdef _DEBUG
@@ -33,12 +34,16 @@ END_MESSAGE_MAP()
 CMyRainmeterDoc::CMyRainmeterDoc()
 {
 	// TODO: 在此添加一次性构造代码
-
+	m_pCurRmCtrl=NULL;
+	
 }
 
 CMyRainmeterDoc::~CMyRainmeterDoc()
 {
-	
+	for (int i = 0; i < m_arrItems.GetSize(); i++)
+	{
+		m_arrItems[i]->InternalRelease();
+	}
 //	delete systemBgPath;
 //	delete pConfigParser;
 }
@@ -52,6 +57,17 @@ BOOL CMyRainmeterDoc::OnNewDocument()
 	// (SDI 文档将重用该文档)
 
 	InitDocument();
+	m_Text = "";
+
+	CMainFrame* pMainFrame = (CMainFrame *)AfxGetApp()->GetMainWnd();
+	pMainFrame->AddStrLogToOutputWnd(_T("Create a new skin"));
+
+	std::pair<CString, CString> pair(_T("Update"), _T("1000"));
+	// Initialize Rainmeter Section
+	//m_Rainmeter.insert(pair);
+	//m_Rainmeter.insert(std::unordered_map::value_type(_T(""), _T("")));
+	//m_Rainmeter.insert(_T("DynamicWindowSize"), _T("0"));
+	//m_Rainmeter.insert(_T("DragMargins"), _T("0,0,0,0"));
 
 	return TRUE;
 }
@@ -61,7 +77,30 @@ BOOL CMyRainmeterDoc::OnOpenDocument( LPCTSTR lpszPathName )
 {
 	if (!CDocument::OnOpenDocument(lpszPathName))
 		return FALSE;
-	InitDocument();
+	
+	InitDocument();	
+
+	CMainFrame* pMainFrame = (CMainFrame *)AfxGetApp()->GetMainWnd();
+	pMainFrame->AddStrLogToOutputWnd(_T("Open skin:")+CString(lpszPathName));
+
+	CStdioFile file(lpszPathName, CFile::modeRead);
+	CString sTemp;
+	bool isEof=FALSE;
+	while (!isEof)
+	{
+		isEof = !file.ReadString(sTemp);
+		m_Text += sTemp+L"\r\n";
+		if (isEof)
+		{
+			break;
+		}
+	}
+	file.Close();
+
+	m_pConfigParser = new CConfigParser(lpszPathName);
+	CString val1 = m_pConfigParser->GetValueString(_T("Rainmeter"),_T("Author"), _T("null"));
+	MessageBox(NULL, val1, _T("Open a skin configuration "), 0);	
+
 	return TRUE;
 }
 
@@ -74,13 +113,9 @@ void CMyRainmeterDoc::InitDocument()
 	hr=CoCreateInstance(CLSID_ActiveDesktop, NULL,CLSCTX_INPROC_SERVER,IID_IActiveDesktop,(void**)&pIAD);//初始化
 	WCHAR wszWallpaper[MAX_PATH];//用于保存背景图片路径
 	hr=pIAD->GetWallpaper(wszWallpaper,MAX_PATH,0);//获取背景图片路径
-	systemBgPath = wszWallpaper;
+	m_SystemBgPath = wszWallpaper;
 
-	pConfigParser = new CConfigParser(_T("E:\\rainmeter\\Rainmeter\\Skins\\阿狸\\ini.ini"));
-	wstring val1 = pConfigParser->GetValueString(_T("Rainmeter"),_T("Author"), _T("null"));
-	MessageBox(NULL, val1.c_str(), _T("aaa"), 0);
-	CMainFrame* pMainFrame = (CMainFrame *)AfxGetApp()->GetMainWnd();
-	pMainFrame->AddStrLogToOutputWnd(val1.c_str());
+	//m_pConfigParser = new CConfigParser(_T("E:\\rainmeter\\Rainmeter\\Skins\\阿狸\\ini.ini"));	
 
 }
 
@@ -90,15 +125,10 @@ void CMyRainmeterDoc::SwitchViewCodeFrame()
 	CFrameWnd *m_pTextViewFrame = NULL;
 
 	// Check and set the TextViewFrame
-	POSITION pos = GetFirstViewPosition();
-	while (pos != NULL)
+	CMyRainmeterTextView* pTextView = GetTextView();
+	if (pTextView != NULL)
 	{
-		CView* pView = GetNextView( pos );
-		if (pView->IsKindOf(RUNTIME_CLASS(CMyRainmeterTextView)))
-		{
-			m_pTextViewFrame = pView->GetParentFrame();
-			break;
-		}
+		m_pTextViewFrame = pTextView->GetParentFrame();
 	}
 		
 	// if TextViewFrame doesn't exist (NULL), initialize and display it.
@@ -131,6 +161,8 @@ void CMyRainmeterDoc::SwitchViewCodeFrame()
 		CDocTemplate* pTemplate = theApp.m_pTemplateTxt;
 		pTemplate->InitialUpdateFrame(m_pTextViewFrame, this);
 	}
+	pTextView = (CMyRainmeterTextView*)m_pTextViewFrame->GetActiveView();
+	pTextView->SetText(m_Text);
 }
 
 
@@ -141,6 +173,7 @@ void CMyRainmeterDoc::Serialize(CArchive& ar)
 	if (ar.IsStoring())
 	{
 		// TODO: 在此添加存储代码
+		ar.Flush();		
 	}
 	else
 	{
@@ -219,51 +252,164 @@ void CMyRainmeterDoc::Add( CRmControl* pObj )
 {
 //	m_RmCtrls.AddTail(pObj);
 //	pObj->m_pDocument = this;
+	m_arrItems.Add(pObj);
 	SetModifiedFlag();
 }
 
 void CMyRainmeterDoc::Remove( CRmControl* pObj )
 {
-
-	SetModifiedFlag();
-}
-
-CRmControl* CMyRainmeterDoc::RmCtrlAt( const CPoint& point )
-{
-	//CRect rect(point, CSize(1, 1));
-	//POSITION pos = m_RmCtrls.GetTailPosition();
-	//while (pos != NULL)
-	//{
-	//	CRmControl* pObj = m_RmCtrls.GetPrev(pos);
-	//	if (pObj->Intersects(rect))
-	//		return pObj;
-	//}
-
-	return NULL;
-}
-
-void CMyRainmeterDoc::Draw( CDC* pDC, CMyRainmeterGraphView* pView )
-{
-//	POSITION pos = m_RmCtrls.GetHeadPosition();
-//	while (pos != NULL)
-//	{
-//		CRmControl* pObj = m_RmCtrls.GetNext(pos);
-//		pObj->Draw(pDC);
-//#ifndef SHARED_HANDLERS
-//		if (pView != NULL && pView->m_bActive && !pDC->IsPrinting() && pView->IsSelected(pObj))
-//			pObj->DrawTracker(pDC, CDrawObj::selected);
-//#endif
-//	}
-}
-
-void CMyRainmeterDoc::Draw( CDC* pDC )
-{
+	for (int i=0; i<m_arrItems.GetSize(); ++i)
+	{
+		CRmControl* pRmCtrl = m_arrItems[i];
+		if (pRmCtrl == pObj)
+		{
+			m_arrItems.RemoveAt(i);
+			pObj->InternalRelease();
+			SetModifiedFlag();
+		}
+	}
 	
 }
 
-void CMyRainmeterDoc::FixUpRmCtrlPositions()
-{
+void CMyRainmeterDoc::RemoveAt(int index)
+{	
+	CRmControl* pRmCtrl = m_arrItems[index];
+//	pRmCtrl->m_pItem->InternalRelease();
+	//delete pRmCtrl->m_pItem;
+	m_arrItems.RemoveAt(index);
+	pRmCtrl->InternalRelease();
+//	delete pRmCtrl;
+	SetModifiedFlag();
+}
 
+void CMyRainmeterDoc::Draw( CDC* pDC, CXTPTaskPanel* pTaskPanel )
+{
+	m_Text="";
+	m_Text+=m_Rainmeter.ToString();
+	m_Text+=m_MeterData.ToString();
+	for (int i = 0; i < m_arrItems.GetSize(); i++)
+	{
+		CRmControl* pRmCtrl = (CRmControl* )m_arrItems[i];
+		
+		CXTPTaskPanelGroupItem* pItem=pRmCtrl->m_pItem;;
+		
+		pRmCtrl->Draw(pDC, pTaskPanel);
+
+		m_Text += pRmCtrl->ToString();
+		/*CRect rcItem = pItem->GetItemRect();		
+
+		CXTPImageManagerIcon* pImage = pTaskPanel->GetImageManager()->GetImage(pItem->GetIconIndex());
+		pTaskPanel->GetPaintManager()->DrawGroupItemFrame(pDC, pItem, rcItem);
+		if (pImage)
+		{
+			CPoint ptIcon((rcItem.right + rcItem.left - 16) / 2, (rcItem.top + rcItem.bottom - 16) / 2);
+			pImage->Draw(pDC, ptIcon, pImage->GetIcon());
+		}*/
+	}
+
+}
+
+
+BOOL CMyRainmeterDoc::DoSave( LPCTSTR pszPathName, BOOL bReplace /*= TRUE*/ )
+{
+	CMainFrame* pMainFrame = (CMainFrame *)AfxGetApp()->GetMainWnd();
+	pMainFrame->AddStrLogToOutputWnd(_T("Saving skin..."));
+
+	CString newName = pszPathName;
+	BOOL bModified = IsModified();
+	BOOL bSaveAs = FALSE;
+	CConfigParser* pConfigParser = m_pConfigParser;
+
+	// First save
+	if (newName.IsEmpty())
+		bSaveAs = TRUE;
+	
+	POSITION pos = GetFirstViewPosition();
+	GetNextView(pos)->GetParentFrame()->RecalcLayout();
+
+	if (bSaveAs)
+	{
+		newName = m_strPathName;
+		if (bReplace && newName.IsEmpty())
+		{
+			newName = m_strTitle;
+		}
+		if (!AfxGetApp()->DoPromptFileName(newName,
+			bReplace ? AFX_IDS_SAVEFILE : AFX_IDS_SAVEFILECOPY,
+			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST, FALSE, this->GetDocTemplate()))
+		{
+			pMainFrame->AddStrLogToOutputWnd(_T("Saving canceled."));
+			return FALSE;
+		}
+		pConfigParser = new CConfigParser(newName);
+	}
+	BeginWaitCursor();
+
+	OnSaveDocument(newName);	
+
+	
+	CStdioFile file(newName, CFile::modeWrite | CFile::typeBinary );
+	file.Write("\377\376", 2);
+	file.WriteString(m_Text);
+	file.Flush();
+	file.Close();
+	//for (unordered_map<CString, CString>::iterator iter = m_Rainmeter.begin(); iter != m_Rainmeter.end(); ++iter)
+	//{
+	//	pConfigParser->SetValueString(_T("Rainmeter"), iter->first, iter->second);
+	//}
+	//
+	////m_pConfigParser->
+	//
+	//// iterate the items, write data to the configuration file
+	//CRmControl* pRmCtrl;
+	//for (int i=0; i<m_arrItems.GetSize(); ++i)
+	//{
+	//	pRmCtrl = (CRmControl* )m_arrItems[i];
+	//	pRmCtrl->WriteToFile(pConfigParser);
+	//}
+
+	m_pConfigParser = pConfigParser;
+	// Set the path, otherwise the program would show the save file dialog every time.
+	SetPathName(newName);
+	ASSERT(m_strPathName == newName);       // must be set
+
+	pMainFrame->AddStrLogToOutputWnd(_T("Skin has been saved."));
+	
+	EndWaitCursor();
+	return TRUE;
+}
+
+void CMyRainmeterDoc::UpdateAllViews( CView* pSender, LPARAM lHint /* = 0L */, CObject* pHint /* = NULL */ )
+{
+	m_Text="";
+	m_Text+=m_Rainmeter.ToString();
+	m_Text+=m_MeterData.ToString();
+	for (int i = 0; i < m_arrItems.GetSize(); i++)
+	{
+		CRmControl* pRmCtrl = (CRmControl* )m_arrItems[i];
+		m_Text += pRmCtrl->ToString();		
+	}
+	CMyRainmeterTextView* pTextView = GetTextView();
+	if (pTextView)
+	{
+		pTextView->SetText(m_Text);
+	}	
+	__super::UpdateAllViews(pSender, lHint, pHint);	
+}
+
+
+CMyRainmeterTextView* CMyRainmeterDoc::GetTextView()
+{
+	POSITION pos = GetFirstViewPosition();
+	while (pos != NULL)
+	{
+		CView* pView = GetNextView( pos );
+		if (pView->IsKindOf(RUNTIME_CLASS(CMyRainmeterTextView)))
+		{
+			return (CMyRainmeterTextView* )pView;			
+		}
+	}
+	return NULL;
 }
 
 

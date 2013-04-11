@@ -254,7 +254,7 @@ void CConfigParser::SetBuiltInVariables( std::wstring strVariable, const std::ws
 }
 
 
-std::wstring CConfigParser::GetValueString(LPCTSTR section, LPCTSTR key, LPCTSTR defValue)
+CString CConfigParser::GetValueString(LPCTSTR section, LPCTSTR key, LPCTSTR defValue)
 {
 	TCHAR strTmp[MAX_LINE_LENGTH];
 	DWORD nSize = MAX_LINE_LENGTH;
@@ -262,14 +262,14 @@ std::wstring CConfigParser::GetValueString(LPCTSTR section, LPCTSTR key, LPCTSTR
 	return strTmp;
 }
 
-std::wstring CConfigParser::GetValue(LPCTSTR section, LPCTSTR key, LPCTSTR defValue)
+CString CConfigParser::GetValue(LPCTSTR section, LPCTSTR key, LPCTSTR defValue)
 {
 	return GetValueString(section, key, defValue);
 }
 
 int CConfigParser::ReadInt( LPCTSTR section, LPCTSTR key, int defValue )
 {
-	const std::wstring& result = GetValueString(section, key, L"");
+	const std::wstring& result = GetValueString(section, key, L"").GetBuffer();
 	const WCHAR* string = result.c_str();
 	if (*string == L'(')
 	{
@@ -303,6 +303,16 @@ std::uint64_t CConfigParser::ReadUInt64( LPCTSTR section, LPCTSTR key, uint64_t 
 	// not implemented
 	return defValue;
 }
+
+void CConfigParser::AddSection( LPCTSTR section )
+{
+}
+
+void CConfigParser::SetValueString( LPCTSTR section, LPCTSTR key, LPCTSTR value )
+{
+	WritePrivateProfileString(section, key, value, this->configFileName);
+}
+
 
 
 

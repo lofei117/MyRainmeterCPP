@@ -30,6 +30,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <string>
+#include <cstring>
 #include <cstdint>
 
 using namespace std;
@@ -53,7 +54,7 @@ using namespace std;
 
 #include <XTToolkitPro.h>   // Codejock Software Components
 #include <afxdlgs.h>
-
+#include <afxrich.h>
 
 
 

@@ -5,8 +5,21 @@
 #pragma once
 
 #include "ConfigParser.h"
+#include "Rainmeter.h"
 
 class CMyRainmeterGraphView;
+class CMyRainmeterTextView;
+
+class CString_Hash{
+public:
+	size_t operator()(const CString& str) const
+	{
+		unsigned long __h = 0;
+		for (size_t i = 0 ; i < str.GetLength() ; i ++)
+			__h = 5*__h + str[i];
+		return size_t(__h);
+	}
+};
 
 class CMyRainmeterDoc : public CDocument
 {
@@ -16,23 +29,34 @@ protected: // 仅从序列化创建
 
 // 特性
 public:
-	CString systemBgPath;	//背景图片地址
-	CConfigParser *pConfigParser;
-//	CRmCtrlList m_RmCtrls;
+	CString m_SystemBgPath;	//背景图片地址
+	CRainmeter m_Rainmeter;
+	CMetadata m_MeterData;
+	CString m_Text;
+	CConfigParser *m_pConfigParser;
 	/// Items 
-	CArray<CXTPTaskPanelGroupItem*, CXTPTaskPanelGroupItem*> m_arrItems;
+	CRmCtrlList m_arrItems;
+	CRmControl* m_pCurRmCtrl;
+	
+	//unordered_map<CString, CString, CString_Hash> m_MeterData;
+	//unordered_map<CString, CString, CString_Hash> m_Variables;
+
+protected:
+	
 
 // 操作
-public:
+public:	
 	void SwitchViewCodeFrame();
 //	CRmCtrlList* GetRmCtrls(){return &m_RmCtrls;}
-	void Draw(CDC* pDC, CMyRainmeterGraphView* pView);
-	CRmControl* RmCtrlAt(const CPoint& point);
-	// ------ Draw called for live icon and Win7 taskbar thumbnails
-	void Draw (CDC* pDC);
-	void FixUpRmCtrlPositions();
+	
+	void Draw(CDC* pDC, CXTPTaskPanel* pTaskPanel);
+	void RemoveAt(int index);
+	
 	void Add(CRmControl* pObj);
 	void Remove(CRmControl* pObj);
+	CMyRainmeterTextView* GetTextView();
+	virtual void UpdateAllViews(CView* pSender, LPARAM lHint = 0L, CObject* pHint = NULL);
+	virtual BOOL DoSave(LPCTSTR pszPathName, BOOL bReplace = TRUE);
 
 private:
 	void InitDocument();
@@ -66,3 +90,5 @@ protected:
 	void SetSearchContent(const CString& value);
 #endif // SHARED_HANDLERS
 };
+
+

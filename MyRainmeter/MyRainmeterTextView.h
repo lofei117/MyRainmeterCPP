@@ -7,12 +7,15 @@ class CMyRainmeterTextView : public CEditView
 {
 	DECLARE_DYNCREATE(CMyRainmeterTextView)
 
-public:
+protected:
 	CMyRainmeterTextView();           // 动态创建所使用的受保护的构造函数
 	virtual ~CMyRainmeterTextView();
 
 public:
-	virtual void OnDraw(CDC* pDC);      // 重写以绘制该视图
+	void SetText(CString sText);
+	CString GetText();
+
+public:
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 #ifndef _WIN32_WCE
@@ -21,7 +24,8 @@ public:
 #endif
 
 protected:
-	DECLARE_MESSAGE_MAP()
+	afx_msg void OnEditChange();
+	DECLARE_MESSAGE_MAP()	
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 };
-
 
