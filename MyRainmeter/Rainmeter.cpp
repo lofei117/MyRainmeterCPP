@@ -85,9 +85,9 @@ CMetadata::~CMetadata()
 CString CMetadata::ToString() const
 {
 	CString sTemp;		
-	sTemp.Append(_T(";Meterdata\r\n"));
+	sTemp.Append(_T(";Metadata\r\n"));
 	// Section name
-	sTemp.Append(_T("[MeterData]\r\n"));
+	sTemp.Append(_T("[MetaData]\r\n"));
 	sTemp += CRainmeterUtil::OrgKeyValuePair(L"Name", m_Name, L"");
 	sTemp += CRainmeterUtil::OrgKeyValuePair(L"Author", m_Author, L"");
 	sTemp += CRainmeterUtil::OrgKeyValuePair(L"Information", m_Information, L"");

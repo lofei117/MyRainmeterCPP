@@ -169,39 +169,39 @@ void CPropertiesWnd::InitPropList()
 	m_wndPropList.SetVSDotNetLook();
 	m_wndPropList.MarkModifiedProperties();	
 	
-	
-	CMFCPropertyGridProperty* pGroup2 = new CMFCPropertyGridProperty(_T("字体"));
+	//
+	//CMFCPropertyGridProperty* pGroup2 = new CMFCPropertyGridProperty(_T("字体"));
 
-	LOGFONT lf;
-	CFont* font = CFont::FromHandle((HFONT) GetStockObject(DEFAULT_GUI_FONT));
-	font->GetLogFont(&lf);
+	//LOGFONT lf;
+	//CFont* font = CFont::FromHandle((HFONT) GetStockObject(DEFAULT_GUI_FONT));
+	//font->GetLogFont(&lf);
 
-	lstrcpy(lf.lfFaceName, _T("宋体, Arial"));
+	//lstrcpy(lf.lfFaceName, _T("宋体, Arial"));
 
-	pGroup2->AddSubItem(new CMFCPropertyGridFontProperty(_T("字体"), lf, CF_EFFECTS | CF_SCREENFONTS, _T("指定窗口的默认字体")));
-	pGroup2->AddSubItem(new CMFCPropertyGridProperty(_T("使用系统字体"), (_variant_t) true, _T("指定窗口使用“MS Shell Dlg”字体")));
-	
-	pGroup2->AddSubItem(new CMyPropertyGridActionProterty(_T("testAction"), _T("Test action"))); 
-	//ARGB
-	CMFCPropertyGridColorProperty* pColorProp = new CMFCPropertyGridColorProperty(_T("窗口颜色"), RGB(210, 192, 254), NULL, _T("指定默认的窗口颜色"));
-	pColorProp->EnableOtherButton(_T("其他..."));
-	pColorProp->EnableAutomaticButton(_T("默认"), ::GetSysColor(COLOR_3DFACE));
-	pGroup2->AddSubItem(pColorProp);
+	//pGroup2->AddSubItem(new CMFCPropertyGridFontProperty(_T("字体"), lf, CF_EFFECTS | CF_SCREENFONTS, _T("指定窗口的默认字体")));
+	//pGroup2->AddSubItem(new CMFCPropertyGridProperty(_T("使用系统字体"), (_variant_t) true, _T("指定窗口使用“MS Shell Dlg”字体")));
+	//
+	//pGroup2->AddSubItem(new CMyPropertyGridActionProterty(_T("testAction"), _T("Test action"))); 
+	////ARGB
+	//CMFCPropertyGridColorProperty* pColorProp = new CMFCPropertyGridColorProperty(_T("窗口颜色"), RGB(210, 192, 254), NULL, _T("指定默认的窗口颜色"));
+	//pColorProp->EnableOtherButton(_T("其他..."));
+	//pColorProp->EnableAutomaticButton(_T("默认"), ::GetSysColor(COLOR_3DFACE));
+	//pGroup2->AddSubItem(pColorProp);
 
-	m_wndPropList.AddProperty(pGroup2); 
+	//m_wndPropList.AddProperty(pGroup2); 
 
-	CMFCPropertyGridProperty* pSize = new CMFCPropertyGridProperty(_T("窗口大小"), 0, TRUE);
+	//CMFCPropertyGridProperty* pSize = new CMFCPropertyGridProperty(_T("窗口大小"), 0, TRUE);
 
-	CMFCPropertyGridProperty* pProp = new CMFCPropertyGridProperty(_T("高度"), (_variant_t) 250, _T("指定窗口的高度"));
-	pProp->EnableSpinControl(TRUE, 50, 300);
-	pSize->AddSubItem(pProp);
+	//CMFCPropertyGridProperty* pProp = new CMFCPropertyGridProperty(_T("高度"), (_variant_t) 250, _T("指定窗口的高度"));
+	//pProp->EnableSpinControl(TRUE, 50, 300);
+	//pSize->AddSubItem(pProp);
 
-	pProp = new CMFCPropertyGridProperty( _T("宽度"), (_variant_t) 150, _T("指定窗口的宽度"));
-	pProp->EnableSpinControl(TRUE, 50, 200);
-	pSize->AddSubItem(pProp);
+	//pProp = new CMFCPropertyGridProperty( _T("宽度"), (_variant_t) 150, _T("指定窗口的宽度"));
+	//pProp->EnableSpinControl(TRUE, 50, 200);
+	//pSize->AddSubItem(pProp);
 
 
-	m_wndPropList.AddProperty(pSize);
+	//m_wndPropList.AddProperty(pSize);
 	
 	//LoadRainmeterSection();
 	//LoadMeterDataSection();

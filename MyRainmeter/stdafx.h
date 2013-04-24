@@ -56,6 +56,10 @@ using namespace std;
 #include <afxdlgs.h>
 #include <afxrich.h>
 
+// Using GDI+
+#include <gdiplus.h>  
+#pragma comment(lib, "gdiplus.lib")  
+using namespace Gdiplus; 
 
 
 #ifdef _UNICODE
@@ -69,3 +73,6 @@ using namespace std;
 #endif
 
 
+//#define ARGB(a,r,g,b)        ((COLORREF)(((BYTE)(r)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(b))<<16))|(((DWORD)(BYTE)(a))<<24))
+#define RGBA(r,g,b,a)        ((COLORREF)(((BYTE)(r)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(b))<<16))|(((DWORD)(BYTE)(a))<<24))
+#define GetAValue(rgba)      (LOBYTE((rgba)>>24))

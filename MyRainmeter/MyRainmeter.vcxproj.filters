@@ -79,9 +79,6 @@
     <None Include="UserImages.bmp">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="res\MyRainmeter.rc2">
-      <Filter>资源文件</Filter>
-    </None>
     <None Include="res\MyRainmeterDoc.ico">
       <Filter>资源文件</Filter>
     </None>
@@ -113,6 +110,9 @@
       <Filter>资源文件</Filter>
     </None>
     <None Include="res\rainmeter.bmp">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\rainmeter.ico">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>
@@ -231,6 +231,9 @@
     <ClInclude Include="MeterString.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="StdioFileEx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyRainmeter.cpp">
@@ -336,6 +339,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MeterString.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StdioFileEx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,5 +1,7 @@
 #pragma once
 
+class CConfigParser;
+
 
 // CMeter
 
@@ -33,11 +35,12 @@ protected:
 
 	CString m_OnUpdateAction;	// Action to execute when update the meter
 	CString m_SolidColor;
+	CString m_SolidColor2;
 	int m_GradientAngle;
 	CString m_BevelType;
 	CString m_AntiAlias;
 	CString m_DynamicVariables;
-	CString m_TransfromationMatrix;
+	CString m_TransformationMatrix;
 
 	// General Image Options
 
@@ -61,6 +64,9 @@ protected:
 	
 	CMeter* m_RelativeMeter;
 	CMeter* m_MeterStyleList;		// under construction
+
+	// mouse actions
+	unordered_map<wstring, wstring> m_MouseActions;
 
 // public methods
 public:
@@ -106,6 +112,9 @@ public:
 
 	// Get Meter type, virtual function. CMeter can not be instantiated
 	virtual int GetMeterType()=0;
+
+	// ParseData from the ini file with target section
+	virtual void ParseData(CConfigParser* pConfigParser);
 
 // private methods
 private:

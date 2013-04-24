@@ -6,20 +6,11 @@
 
 #include "ConfigParser.h"
 #include "Rainmeter.h"
+#include "ConstInfo.h"
 
 class CMyRainmeterGraphView;
 class CMyRainmeterTextView;
 
-class CString_Hash{
-public:
-	size_t operator()(const CString& str) const
-	{
-		unsigned long __h = 0;
-		for (size_t i = 0 ; i < str.GetLength() ; i ++)
-			__h = 5*__h + str[i];
-		return size_t(__h);
-	}
-};
 
 class CMyRainmeterDoc : public CDocument
 {
@@ -37,24 +28,35 @@ public:
 	/// Items 
 	CRmCtrlList m_arrItems;
 	CRmControl* m_pCurRmCtrl;
-	
-	//unordered_map<CString, CString, CString_Hash> m_MeterData;
-	//unordered_map<CString, CString, CString_Hash> m_Variables;
+		
+	CArray<CString> m_Sections;
+	unordered_map<wstring, wstring> m_Variables;
+
+	CString m_SkinPath;
+	CString m_CurrentPath;
+	CString m_RelativePath;
 
 protected:
 	
 
 // ²Ù×÷
 public:	
-	void SwitchViewCodeFrame();
-//	CRmCtrlList* GetRmCtrls(){return &m_RmCtrls;}
-	
-	void Draw(CDC* pDC, CXTPTaskPanel* pTaskPanel);
+	// General legal Meter Name
+	CString GeneralSectionName(CString prefix);
+	BOOL IsSectionExits(CString secionName);
+	// SwitchView to Text View, to view code
+	void OpenTxtViewFrame();
+ 	
+//	void Draw(CDC* pDC, CXTPTaskPanel* pTaskPanel);
 	void RemoveAt(int index);
 	
 	void Add(CRmControl* pObj);
 	void Remove(CRmControl* pObj);
-	CMyRainmeterTextView* GetTextView();
+	void MoveUp(CRmControl* pObj);		// move pObj backward
+	void MoveDown(CRmControl* pObj);	// move pObj forward
+
+	CMyRainmeterTextView* GetTextView();	// GetTextView
+	CMyRainmeterGraphView* GetGraphView();
 	virtual void UpdateAllViews(CView* pSender, LPARAM lHint = 0L, CObject* pHint = NULL);
 	virtual BOOL DoSave(LPCTSTR pszPathName, BOOL bReplace = TRUE);
 

@@ -26,7 +26,7 @@ public:
 	CString m_FontFace;
 	int m_FontSize;
 	CString m_FontColor;
-	CString m_StringAligh;
+	CString m_StringAlign;
 	CString m_StringStyle;
 	CString m_StringCase;
 	CString m_StringEffect;
@@ -35,7 +35,7 @@ public:
 	int m_ClipStringW;
 	int m_ClipStringH;
 	float m_Angle;
-	int m_Percentual;
+	CString m_Percentual;
 	int m_NumOfDecimals;
 	int m_Scale;
 	CString m_AutoScale;
@@ -49,6 +49,7 @@ public:
 	virtual void PropertyChanged (CMFCPropertyGridProperty* pProp);
 	virtual CString ToString() const;
 	virtual void UpdateProperties();
+	virtual void ParseData(CConfigParser* pConfigParser);
 
 protected:
 

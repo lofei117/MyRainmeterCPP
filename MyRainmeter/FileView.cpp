@@ -4,6 +4,7 @@
 #include "FileView.h"
 #include "Resource.h"
 #include "MyRainmeter.h"
+#include "ConstInfo.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -39,6 +40,7 @@ BEGIN_MESSAGE_MAP(CFileView, CDockablePane)
 	ON_COMMAND(ID_OPEN_NOTEPAD, &CFileView::OnOpenNotepad)
 	ON_COMMAND(ID_OPEN_BUILTIN_TXT, &CFileView::OnOpenBuiltinTxt)
 	ON_COMMAND(ID_OPEN_BUILTIN_GUI, &CFileView::OnOpenBuiltinGui)
+	ON_COMMAND(ID_REFRESH, &CFileView::OnRefresh)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -94,7 +96,18 @@ void CFileView::OnSize(UINT nType, int cx, int cy)
 
 void CFileView::FillFileView()
 {
-	HTREEITEM hRoot = m_wndFileView.InsertItem(_T("FakeApp 文件"), 0, 0);
+	CString SkinFolder = theApp.m_SkinFolder;
+	CString skinName = PathFindFileName(SkinFolder);
+//	SkinFolder = _T("C:\\Users\\lofei\\Desktop\\222");
+	if (SkinFolder.Trim().CompareNoCase(_T("")) != 0)
+	{		
+		HTREEITEM hRoot = m_wndFileView.InsertItem(skinName, 0, 0);
+		m_wndFileView.SetItemState(hRoot, TVIS_BOLD, TVIS_BOLD);
+		TraverseDir(SkinFolder, hRoot);
+		m_wndFileView.Expand(hRoot, TVE_EXPAND);
+	}	
+	
+	/*HTREEITEM hRoot = m_wndFileView.InsertItem(_T("FakeApp 文件"), 0, 0);
 	m_wndFileView.SetItemState(hRoot, TVIS_BOLD, TVIS_BOLD);
 
 	HTREEITEM hSrc = m_wndFileView.InsertItem(_T("FakeApp 源文件"), 0, 0, hRoot);
@@ -124,7 +137,7 @@ void CFileView::FillFileView()
 
 	m_wndFileView.Expand(hRoot, TVE_EXPAND);
 	m_wndFileView.Expand(hSrc, TVE_EXPAND);
-	m_wndFileView.Expand(hInc, TVE_EXPAND);
+	m_wndFileView.Expand(hInc, TVE_EXPAND);*/
 }
 
 void CFileView::OnContextMenu(CWnd* pWnd, CPoint point)
@@ -148,7 +161,7 @@ void CFileView::OnContextMenu(CWnd* pWnd, CPoint point)
 		HTREEITEM hTreeItem = pWndTree->HitTest(ptTree, &flags);
 		if (hTreeItem != NULL)
 		{
-			pWndTree->SelectItem(hTreeItem);
+			pWndTree->SelectItem(hTreeItem);			
 		}
 	}
 
@@ -181,6 +194,12 @@ void CFileView::OnProperties()
 void CFileView::OnFileOpen()
 {
 	// TODO: 在此处添加命令处理程序代码
+	CString file = m_wndFileView.GetSelectItemPath();
+
+	if (!PathIsDirectory(file))
+	{
+		AfxGetApp()->OpenDocumentFile(file);
+	}	
 }
 
 //void CFileView::OnFileOpenWith()
@@ -263,26 +282,81 @@ void CFileView::OnChangeVisualStyle()
 void CFileView::OnOpenSys()
 {
 	// TODO: 在此添加命令处理程序代码
-	ShellExecute(NULL, _T("open"), _T("e:\\test.txt"), NULL, NULL, SW_SHOW);
+	CString file = m_wndFileView.GetSelectItemPath();
+	if (!PathIsDirectory(file))
+	{
+		ShellExecute(NULL, _T("open"), file, NULL, NULL, SW_SHOW);
+	}
 }
 
 
 void CFileView::OnOpenNotepad()
 {
 	// TODO: 在此添加命令处理程序代码
-	ShellExecute(NULL, NULL, _T("notepad.exe"), _T(" e:\\test.txt"), NULL, SW_SHOW);
+	CString file = m_wndFileView.GetSelectItemPath();
+	if (!PathIsDirectory(file))
+	{
+		ShellExecute(NULL, NULL, _T("notepad.exe"), file, NULL, SW_SHOW);
+	}
 }
 
 
 void CFileView::OnOpenBuiltinTxt()
 {
 	// TODO: 在此添加命令处理程序代码
-	AfxMessageBox(_T("Open with built-in text editor"));
+	//AfxMessageBox(_T("Open with built-in text editor"));
+	CString file = m_wndFileView.GetSelectItemPath();
+	if (!PathIsDirectory(file))
+	{
+		theApp.m_pTemplateTxt->OpenDocumentFile(file);
+	}
 }
 
 
 void CFileView::OnOpenBuiltinGui()
 {
 	// TODO: 在此添加命令处理程序代码
-	AfxMessageBox(_T("Load the gui and show"));
+	OnFileOpen();
 }
+
+void CFileView::TraverseDir( CString folderName, HTREEITEM hParent )
+{
+	CFileFind fileFind;
+	CString folder;
+	PathCombine(folder.GetBuffer(MAX_FILENAME_LENGTH), folderName, _T("*.*"));
+
+	BOOL ret = fileFind.FindFile(folder);
+	while(ret)
+	{
+		ret = fileFind.FindNextFile();
+		//if (ret)
+		{
+			CString path = fileFind.GetFilePath();
+			CString name = fileFind.GetFileName();
+			if (fileFind.IsDirectory() && !fileFind.IsDots())
+			{
+				//CString path = fileFind.GetFilePath();
+				HTREEITEM hNode = m_wndFileView.InsertItem(name, 0, 0, hParent);				
+				TraverseDir(path, hNode);
+				m_wndFileView.Expand(hParent, TVE_EXPAND);
+			}
+			else if (!fileFind.IsDirectory() && !fileFind.IsDots())
+			{
+				
+				m_wndFileView.InsertItem(name, 1, 1, hParent);
+			}
+		}
+	}
+	fileFind.Close();
+}
+
+
+void CFileView::OnRefresh()
+{
+	// TODO: 在此添加命令处理程序代码
+	m_wndFileView.DeleteAllItems();
+	FillFileView();
+}
+
+
+

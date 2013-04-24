@@ -16,6 +16,12 @@
 
 
 #include <propkey.h>
+#include "RainmeterUtil.h"
+#include "StdioFileEx.h"
+#include "MeterImage.h"
+#include "MeterString.h"
+#include "MeterBar.h"
+#include "MyRainmeterGraphView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -35,7 +41,7 @@ CMyRainmeterDoc::CMyRainmeterDoc()
 {
 	// TODO: 在此添加一次性构造代码
 	m_pCurRmCtrl=NULL;
-	
+	m_SkinPath = theApp.m_SkinFolder;
 }
 
 CMyRainmeterDoc::~CMyRainmeterDoc()
@@ -75,16 +81,19 @@ BOOL CMyRainmeterDoc::OnNewDocument()
 
 BOOL CMyRainmeterDoc::OnOpenDocument( LPCTSTR lpszPathName )
 {
-	if (!CDocument::OnOpenDocument(lpszPathName))
+	CString fileName = lpszPathName;
+	
+	if (!CDocument::OnOpenDocument(fileName))
 		return FALSE;
 	
 	InitDocument();	
 
 	CMainFrame* pMainFrame = (CMainFrame *)AfxGetApp()->GetMainWnd();
-	pMainFrame->AddStrLogToOutputWnd(_T("Open skin:")+CString(lpszPathName));
+	pMainFrame->AddStrLogToOutputWnd(_T("Open skin:")+CString(fileName));
 
-	CStdioFile file(lpszPathName, CFile::modeRead);
+	CStdioFileEx file(fileName, CFile::modeRead | CFile::typeText);	
 	CString sTemp;
+	
 	bool isEof=FALSE;
 	while (!isEof)
 	{
@@ -96,11 +105,89 @@ BOOL CMyRainmeterDoc::OnOpenDocument( LPCTSTR lpszPathName )
 		}
 	}
 	file.Close();
+		
+	m_pConfigParser = new CConfigParser(fileName);
 
-	m_pConfigParser = new CConfigParser(lpszPathName);
-	CString val1 = m_pConfigParser->GetValueString(_T("Rainmeter"),_T("Author"), _T("null"));
-	MessageBox(NULL, val1, _T("Open a skin configuration "), 0);	
+	unordered_set<wstring> sections = m_pConfigParser->GetSections();
+	for (unordered_set<wstring>::iterator iter = sections.cbegin();iter!=sections.cend(); ++iter)
+	{
+		CRmControl* pRmCtrl;
+		CString name = iter->data();
+		CString meterType;
+		//GetPrivateProfileString(name, L"Meter", L"", meterType.GetBuffer(), 1024, fileName);
+		meterType = m_pConfigParser->GetValueString(name, L"Meter", L"");
+		if (meterType.Trim().CompareNoCase(L"") == 0)
+		{
+			meterType = m_pConfigParser->GetValueString(name, L"Meansure", L"");
+		}
+		/*COleDataObject *pDataObject = new COleDataObject;
+		pDataObject->AttachClipboard();*/
 
+		CKitView* pKitViewPane = pMainFrame->GetKitVew();
+
+		ASSERT_KINDOF(CKitView, pKitViewPane);
+
+		CXTPTaskPanel* pTaskPanel = (CXTPTaskPanel*)pKitViewPane->GetTaskPanel();		
+		
+		COleDataObject* pDataObject = new COleDataObject;
+		CXTPTaskPanelGroupItem* pItem;
+		CXTPTaskPanelGroupItem* pItemTool;
+		
+		
+	//	pItem->PrepareDrag(ds);
+
+		
+	//	pItem->SetCaption(meterType);	
+		
+		if (meterType.CompareNoCase(_T("Bar")) == 0)
+		{
+			//pRmCtrl = new CMeterBar(pItem);
+		}
+		else if (meterType.CompareNoCase(_T("Image")) == 0)
+		{
+			pItemTool = pTaskPanel->FindItem(ID_TOOLBOXITEM_IMAGE);
+			//pItemTool->PrepareDrag(ds);
+			pItemTool->CopyToClipboard();
+			pDataObject->AttachClipboard();
+			
+			pItem = (CXTPTaskPanelGroupItem*)CXTPTaskPanelItem::CreateFromOleData(pDataObject);
+			CMeterImage* pMeterImage = new CMeterImage(pItem, GetGraphView());
+			pMeterImage->SetMeterName(name);
+			pMeterImage->ParseData(m_pConfigParser);
+			pRmCtrl = pMeterImage;
+			//pRmCtrl = new CMeterImage(pItemDrop, this);		
+			
+			m_Sections.Add(name);
+			pItem->AllowDrag(TRUE);
+			m_pCurRmCtrl = pRmCtrl;
+			Add(pRmCtrl);
+		} 
+		else if (meterType.CompareNoCase(_T("String")) == 0)
+		{
+			pItemTool = pTaskPanel->FindItem(ID_TOOLBOXITEM_STRING);
+			pItemTool->CopyToClipboard();
+			pDataObject->AttachClipboard();
+
+			pItem = (CXTPTaskPanelGroupItem*)CXTPTaskPanelItem::CreateFromOleData(pDataObject);
+
+			CMeterString* pMeterString = new CMeterString(pItem, GetGraphView());
+			pMeterString->SetMeterName(name);
+			pMeterString->ParseData(m_pConfigParser);
+			pRmCtrl = pMeterString;
+
+			m_Sections.Add(name);
+			pItem->AllowDrag(TRUE);
+			m_pCurRmCtrl = pRmCtrl;
+			Add(pRmCtrl);
+		} 
+		/*else
+		{
+			pItemTool = pTaskPanel->FindItem(ID_TOOLBOXITEM_IMAGE);
+			pRmCtrl = new CRmControl(pItem, GetGraphView());
+		}*/
+			
+	}
+		
 	return TRUE;
 }
 
@@ -115,12 +202,13 @@ void CMyRainmeterDoc::InitDocument()
 	hr=pIAD->GetWallpaper(wszWallpaper,MAX_PATH,0);//获取背景图片路径
 	m_SystemBgPath = wszWallpaper;
 
-	//m_pConfigParser = new CConfigParser(_T("E:\\rainmeter\\Rainmeter\\Skins\\阿狸\\ini.ini"));	
+	// Initialize the skin path
+	m_SkinPath = theApp.m_SkinFolder;
 
 }
 
 
-void CMyRainmeterDoc::SwitchViewCodeFrame()
+void CMyRainmeterDoc::OpenTxtViewFrame()
 {
 	CFrameWnd *m_pTextViewFrame = NULL;
 
@@ -248,6 +336,9 @@ void CMyRainmeterDoc::Dump(CDumpContext& dc) const
 	CDocument::Dump(dc);
 }
 
+#endif //_DEBUG
+
+
 void CMyRainmeterDoc::Add( CRmControl* pObj )
 {
 //	m_RmCtrls.AddTail(pObj);
@@ -264,17 +355,25 @@ void CMyRainmeterDoc::Remove( CRmControl* pObj )
 		if (pRmCtrl == pObj)
 		{
 			m_arrItems.RemoveAt(i);
-			pObj->InternalRelease();
+			//pObj->InternalRelease();	 /// call it outside this method
 			SetModifiedFlag();
 		}
-	}
-	
+	}	
 }
 
 void CMyRainmeterDoc::RemoveAt(int index)
 {	
 	CRmControl* pRmCtrl = m_arrItems[index];
-//	pRmCtrl->m_pItem->InternalRelease();
+	CMeter* pMeter = (CMeter*)pRmCtrl;
+	CString str = pMeter->GetMeterName();
+	for (int i= 0;i<m_Sections.GetSize(); ++i)
+	{
+		if (str.CompareNoCase(m_Sections[i]) == 0)
+		{
+			m_Sections.RemoveAt(i);
+			break;
+		}
+	}
 	//delete pRmCtrl->m_pItem;
 	m_arrItems.RemoveAt(index);
 	pRmCtrl->InternalRelease();
@@ -282,32 +381,37 @@ void CMyRainmeterDoc::RemoveAt(int index)
 	SetModifiedFlag();
 }
 
-void CMyRainmeterDoc::Draw( CDC* pDC, CXTPTaskPanel* pTaskPanel )
+void CMyRainmeterDoc::MoveUp( CRmControl* pObj )
 {
-	m_Text="";
-	m_Text+=m_Rainmeter.ToString();
-	m_Text+=m_MeterData.ToString();
-	for (int i = 0; i < m_arrItems.GetSize(); i++)
-	{
-		CRmControl* pRmCtrl = (CRmControl* )m_arrItems[i];
-		
-		CXTPTaskPanelGroupItem* pItem=pRmCtrl->m_pItem;;
-		
-		pRmCtrl->Draw(pDC, pTaskPanel);
-
-		m_Text += pRmCtrl->ToString();
-		/*CRect rcItem = pItem->GetItemRect();		
-
-		CXTPImageManagerIcon* pImage = pTaskPanel->GetImageManager()->GetImage(pItem->GetIconIndex());
-		pTaskPanel->GetPaintManager()->DrawGroupItemFrame(pDC, pItem, rcItem);
-		if (pImage)
-		{
-			CPoint ptIcon((rcItem.right + rcItem.left - 16) / 2, (rcItem.top + rcItem.bottom - 16) / 2);
-			pImage->Draw(pDC, ptIcon, pImage->GetIcon());
-		}*/
-	}
-
+	Remove(pObj);
+	m_arrItems.Add(pObj);
+	SetModifiedFlag();
 }
+
+void CMyRainmeterDoc::MoveDown( CRmControl* pObj )
+{
+	Remove(pObj);
+	m_arrItems.InsertAt(0, pObj);
+	SetModifiedFlag();
+}
+
+
+//void CMyRainmeterDoc::Draw( CDC* pDC, CXTPTaskPanel* pTaskPanel )
+//{
+//	m_Text="";
+//	m_Text+=m_Rainmeter.ToString();
+//	m_Text+=m_MeterData.ToString();
+//	for (int i = 0; i < m_arrItems.GetSize(); i++)
+//	{
+//		CRmControl* pRmCtrl = (CRmControl* )m_arrItems[i];
+//		
+//		CXTPTaskPanelGroupItem* pItem=pRmCtrl->m_pItem;;
+//		
+//		pRmCtrl->Draw(pDC, pTaskPanel);
+//
+//		m_Text += pRmCtrl->ToString();
+//	}
+//}
 
 
 BOOL CMyRainmeterDoc::DoSave( LPCTSTR pszPathName, BOOL bReplace /*= TRUE*/ )
@@ -333,6 +437,9 @@ BOOL CMyRainmeterDoc::DoSave( LPCTSTR pszPathName, BOOL bReplace /*= TRUE*/ )
 		if (bReplace && newName.IsEmpty())
 		{
 			newName = m_strTitle;
+			CString sTemp;
+			PathCombine(sTemp.GetBuffer(MAX_FILENAME_LENGTH), m_SkinPath, newName);
+			newName = sTemp;
 		}
 		if (!AfxGetApp()->DoPromptFileName(newName,
 			bReplace ? AFX_IDS_SAVEFILE : AFX_IDS_SAVEFILECOPY,
@@ -347,9 +454,12 @@ BOOL CMyRainmeterDoc::DoSave( LPCTSTR pszPathName, BOOL bReplace /*= TRUE*/ )
 
 	OnSaveDocument(newName);	
 
+	//FILE * pFile = _wfopen( newName, L"wt+,ccs=UTF-8"); 
 	
-	CStdioFile file(newName, CFile::modeWrite | CFile::typeBinary );
-	file.Write("\377\376", 2);
+	CStdioFileEx file(newName, CFile::modeWrite | CFile::typeText );
+	//setlocale(LC_CTYPE, "zh_CN.UTF-8");
+	//CStdioFile file(pFile);
+	//file.Write("\377\376", 2);
 	file.WriteString(m_Text);
 	file.Flush();
 	file.Close();
@@ -412,8 +522,48 @@ CMyRainmeterTextView* CMyRainmeterDoc::GetTextView()
 	return NULL;
 }
 
+CMyRainmeterGraphView* CMyRainmeterDoc::GetGraphView()
+{
+	POSITION pos = GetFirstViewPosition();
+	while (pos != NULL)
+	{
+		CView* pView = GetNextView( pos );
+		if (pView->IsKindOf(RUNTIME_CLASS(CMyRainmeterGraphView)))
+		{
+			return (CMyRainmeterGraphView* )pView;			
+		}
+	}
+	return NULL;
+}
 
-#endif //_DEBUG
+BOOL CMyRainmeterDoc::IsSectionExits( CString secionName)
+{
+	for (int i=0; i<m_Sections.GetSize(); ++i)
+	{
+		CString str = m_Sections.GetAt(i);
+		if (str.CompareNoCase(secionName) == 0)
+		{
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+CString CMyRainmeterDoc::GeneralSectionName( CString prefix)
+{
+	CString str;
+	for (int i=0; ;i++)
+	{
+		str.Format(_T("%s%d"), prefix, i);
+		if (!IsSectionExits(str))
+		{
+			m_Sections.Add(str);
+			break;
+		}
+	}
+	return str;
+}
+
 
 
 // CMyRainmeterDoc 命令

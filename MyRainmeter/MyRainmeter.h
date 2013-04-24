@@ -18,9 +18,14 @@ class CMyRainmeterApp : public CWinAppEx
 {
 public:
 	CMyRainmeterApp();
+	~CMyRainmeterApp();
 
 public:
 	CMultiDocTemplate* m_pTemplateTxt;
+	CString m_SkinFolder;
+
+protected:
+	ULONG_PTR m_gdiplusToken;  
 
 // ÖØÐ´
 public:
@@ -38,9 +43,10 @@ public:
 	afx_msg void OnAppAbout();	
 	afx_msg void OnFileNewConfig();
 	afx_msg void OnFileNewSkin();
-	DECLARE_MESSAGE_MAP()
-	afx_msg void OnFileNew();
+	afx_msg void OnFileOpenSkin();
+	afx_msg void OnFileOpenConfig();
 
+	DECLARE_MESSAGE_MAP()
 };
 
 extern CMyRainmeterApp theApp;

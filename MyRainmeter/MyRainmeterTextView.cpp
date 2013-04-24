@@ -61,7 +61,10 @@ CString CMyRainmeterTextView::GetText()
 void CMyRainmeterTextView::OnEditChange()
 {
 	CMyRainmeterDoc* pDoc = (CMyRainmeterDoc*)GetDocument();
-	pDoc->m_Text = GetText();
+	if (pDoc)
+	{
+		pDoc->m_Text = GetText();
+	}	
 }
 
 BOOL CMyRainmeterTextView::PreCreateWindow(CREATESTRUCT& cs)
@@ -69,4 +72,17 @@ BOOL CMyRainmeterTextView::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: 在此添加专用代码和/或调用基类
 	//cs.style |= ES_READONLY;
 	return CEditView::PreCreateWindow(cs);
+}
+
+
+void CMyRainmeterTextView::OnInitialUpdate()
+{
+	CEditView::OnInitialUpdate();
+
+	// TODO: 在此添加专用代码和/或调用基类
+	CMyRainmeterDoc* pDoc = (CMyRainmeterDoc*)GetDocument();
+	if (pDoc)
+	{
+		SetText(pDoc->m_Text);
+	}
 }

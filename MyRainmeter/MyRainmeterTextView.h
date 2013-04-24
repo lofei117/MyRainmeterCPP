@@ -27,5 +27,7 @@ protected:
 	afx_msg void OnEditChange();
 	DECLARE_MESSAGE_MAP()	
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+public:
+	virtual void OnInitialUpdate();
 };
 

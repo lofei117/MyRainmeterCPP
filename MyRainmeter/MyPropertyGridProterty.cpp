@@ -6,7 +6,6 @@
 #include "MyPropertyGridProterty.h"
 
 
-
 CActionDlg::CActionDlg() : CDialogEx(CActionDlg::IDD)
 {
 }
@@ -137,5 +136,107 @@ void CMyPropertyGridActionProterty::OnClickButton( CPoint point )
 		m_pWndList->SetFocus();
 	}
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+//CMFCPropertyGridColor32Property
+
+CMyPropertyGridColor32Property::CMyPropertyGridColor32Property(const CString& strName, const COLORREF& color,CPalette* pPalette/*=NULL*/,LPCTSTR lpszDescr/*=NULL*/,DWORD_PTR dwData/*=0*/)
+	:CMFCPropertyGridColorProperty(strName,color,pPalette,lpszDescr,dwData)
+{
+	 
+}
+
+CMyPropertyGridColor32Property::~CMyPropertyGridColor32Property()
+{
+	
+}
+
+BOOL CMyPropertyGridColor32Property::OnUpdateValue()
+{
+	ASSERT_VALID(this);
+
+	if (m_pWndInPlace == NULL)
+	{
+		return FALSE;
+	}
+
+	ASSERT_VALID(m_pWndInPlace);
+	ASSERT(::IsWindow(m_pWndInPlace->GetSafeHwnd()));
+
+	CString strText;
+	m_pWndInPlace->GetWindowText(strText);
+
+	COLORREF colorCurr = m_Color;
+	int nA = 0,nR = 0, nG = 0, nB = 0;
+	_stscanf_s(strText, _T("%3d,%3d,%3d,%3d"), &nR, &nG, &nB, &nA);
+	
+	if(nA == 0 && (nR !=0 || nG != 0 || nB !=  0))
+		nA = 0xFF;
+	/*if(nA == 0 && (nR ==0 && nG == 0 && nB ==  0))
+		nA = 0xFF;*/
+	
+	m_Color = RGBA(nR, nG, nB, nA);
+
+	if (colorCurr != m_Color)
+	{
+		m_pWndList->OnPropertyChanged(this);
+	}
+
+	return TRUE;
+}
+
+void CMyPropertyGridColor32Property::OnDrawValue(CDC* pDC, CRect rect)
+{
+	// Initialize GDI+Obj
+	Graphics GDIplusObj(pDC->m_hDC); 
+
+	CRect rectColor = rect;
+
+	rect.left += rect.Height();
+	CMFCPropertyGridProperty::OnDrawValue(pDC, rect);
+
+	rectColor.right = rectColor.left + rectColor.Height(); 
+	rectColor.DeflateRect(1, 1);
+	rectColor.top++;
+	rectColor.left++;	
+
+	RectF drawRect((Gdiplus::REAL)rectColor.left, (Gdiplus::REAL)rectColor.top, (Gdiplus::REAL)rectColor.Height(), (Gdiplus::REAL)rectColor.Height());
+
+	SolidBrush brush(Color(GetAValue(m_Color),GetRValue(m_Color),GetGValue(m_Color),GetBValue(m_Color)));	
+	GDIplusObj.FillRectangle(&brush, drawRect);
+
+	GDIplusObj.ReleaseHDC(pDC->m_hDC);
+	/*CBrush br(m_Color == (COLORREF)-1 ? m_ColorAutomatic : (m_Color&0x00FFFFFF));	
+	pDC->FillRect(rectColor, &br);
+	pDC->Draw3dRect(rectColor, 0, 0);*/
+}
+
+CString CMyPropertyGridColor32Property::FormatProperty()
+{
+	ASSERT_VALID(this);
+
+	CString str;
+	str.Format(_T("%d,%d,%d,%d"),GetRValue(m_Color),GetGValue(m_Color),GetBValue(m_Color),GetAValue(m_Color));
+
+	return str;
+}
+
+BOOL CMyPropertyGridColor32Property::OnEdit( LPPOINT lptClick )
+{
+	__super::OnEdit(lptClick);
+	CMFCMaskedEdit* pWndEdit = (CMFCMaskedEdit *)m_pWndInPlace;
+	pWndEdit->SetValidChars(_T("01234567890ABCDEFabcdef,"));	
+	m_pWndInPlace->SetWindowText(FormatProperty());
+	return TRUE;
+}
+
+COleVariant CMyPropertyGridColor32Property::GetValue()
+{
+	COleVariant value = FormatProperty();
+	return value;
+}
+
+
 
 

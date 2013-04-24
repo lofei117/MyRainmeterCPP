@@ -13,9 +13,10 @@
 #include "MyRainmeterGraphView.h"
 #include "MyRainmeterTextView.h"
 
-#include <AFXPRIV.H>
 
-//#include "ConfigParser.h"
+#include <AFXPRIV.H>
+#include "RainmeterUtil.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -28,14 +29,17 @@ BEGIN_MESSAGE_MAP(CMyRainmeterApp, CWinAppEx)
 	ON_COMMAND(ID_APP_ABOUT, &CMyRainmeterApp::OnAppAbout)
 	// 基于文件的标准文档命令
 	//ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
+	
 	// 标准打印设置命令
 	ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinAppEx::OnFilePrintSetup)
 	//新建配置文件
 	ON_COMMAND(ID_FILE_NEW_CONFIG, &CMyRainmeterApp::OnFileNewConfig)
 	//新建皮肤
 	ON_COMMAND(ID_FILE_NEW_SKIN, &CMyRainmeterApp::OnFileNewSkin)
-	ON_COMMAND(ID_FILE_NEW, &CMyRainmeterApp::OnFileNew)
+	// 打开皮肤	
+	ON_COMMAND(ID_FILE_OPEN_SKIN, &CMyRainmeterApp::OnFileOpenSkin)
+	// 打开配置文件
+	ON_COMMAND(ID_FILE_OPEN_CONFIG, &CMyRainmeterApp::OnFileOpenConfig)
 END_MESSAGE_MAP()
 
 
@@ -43,6 +47,10 @@ END_MESSAGE_MAP()
 
 CMyRainmeterApp::CMyRainmeterApp()
 {
+	// Startup GDI+
+	GdiplusStartupInput input;  
+	GdiplusStartup(&m_gdiplusToken, &input, NULL); 
+
 	m_bHiColorIcons = TRUE;
 
 	// 支持重新启动管理器
@@ -61,6 +69,14 @@ CMyRainmeterApp::CMyRainmeterApp()
 	// TODO: 在此处添加构造代码，
 	// 将所有重要的初始化放置在 InitInstance 中
 }
+
+// 析构函数
+CMyRainmeterApp::~CMyRainmeterApp()
+{
+	// Shutdown GDI+
+	GdiplusShutdown(m_gdiplusToken);  
+}
+
 
 // 唯一的一个 CMyRainmeterApp 对象
 
@@ -249,7 +265,26 @@ void CMyRainmeterApp::SaveCustomState()
 // CMyRainmeterApp 消息处理程序
 
 
+void CMyRainmeterApp::OnFileOpenSkin()
+{
+	// TODO: 在此添加命令处理程序代码
+	CString folder;
+	if(CRainmeterUtil::ChooseFolder(m_pMainWnd->m_hWnd, _T("选择文件夹"), folder))
+	{
+		m_SkinFolder = folder;		
+		CMainFrame* pMainFrame = (CMainFrame* )AfxGetMainWnd();
+		CFileView* pFileView = pMainFrame->GetFileView();
+		pFileView->OnRefresh();
+		pMainFrame=NULL;
+		pFileView=NULL;
+	}
+}
 
+void CMyRainmeterApp::OnFileOpenConfig()
+{
+	// TODO: 在此添加命令处理程序代码
+	CWinAppEx::OnFileOpen();
+}
 
 
 void CMyRainmeterApp::OnFileNewConfig()
@@ -266,26 +301,71 @@ void CMyRainmeterApp::OnFileNewConfig()
 void CMyRainmeterApp::OnFileNewSkin()
 {
 	// TODO: 在此添加命令处理程序代码
-	MessageBox(NULL, _T("fff"), _T("aaa"), 0);
+	CString folder;
+	if(CRainmeterUtil::ChooseFolder(m_pMainWnd->m_hWnd, _T("选择文件夹"), folder))
+	{
+		//m_SkinFolder += L"\\MyRainmeterSkin";		
+		PathCombine(m_SkinFolder.GetBuffer(MAX_FILENAME_LENGTH), folder, L"MyRainmeterSkin");
+		
+		if(PathIsDirectory(m_SkinFolder))  
+		{
+			AfxMessageBox(_T("MyRainmeterSkin目录已存在，请选择其他目录"));
+		}
+		else	
+		{
+			if (CreateDirectory(m_SkinFolder, NULL))	
+			{
+				CString resFolder, fontFolder, imgFolder,cursorFolder;
+				
+				// Create resources folder
+				PathCombine(resFolder.GetBuffer(MAX_FILENAME_LENGTH), m_SkinFolder, L"@Resources");				
+				CreateDirectory(resFolder, NULL);
+
+				// Create font folder
+				PathCombine(fontFolder.GetBuffer(MAX_FILENAME_LENGTH), resFolder, L"font");
+				CreateDirectory(fontFolder, NULL);
+
+				// Create image folder
+				PathCombine(imgFolder.GetBuffer(MAX_FILENAME_LENGTH), resFolder, L"image");
+				CreateDirectory(imgFolder, NULL);
+
+				// Create cursor folder
+				PathCombine(cursorFolder.GetBuffer(MAX_FILENAME_LENGTH), resFolder, L"cursor");
+				CreateDirectory(cursorFolder, NULL);
+				
+				CMainFrame* pMainFrame = (CMainFrame* )AfxGetMainWnd();
+				CFileView* pFileView = pMainFrame->GetFileView();
+				pFileView->OnRefresh();
+				pMainFrame=NULL;
+				pFileView=NULL;
+			}
+			else
+			{
+				AfxMessageBox(_T("很抱歉，创建目录失败，请重试！"));
+			}
+		}
+		//AfxMessageBox(m_SkinFolder);
+	}
 	
 }
 
 
-void CMyRainmeterApp::OnFileNew()
-{
-	// TODO: 在此添加命令处理程序代码
-	//for(POSITION tPos = theApp.m_pDocManager->GetFirstDocTemplatePosition();tPos!=NULL;)
-	//{
-	//	//get pointer to the CdocTemplates.
-	//	CDocTemplate * ptempDocTemplate = 
-	//		theApp.m_pDocManager->GetNextDocTemplate (tPos);
-	//	//this will make the view visible.
-	//	ptempDocTemplate->OpenDocumentFile(NULL);
-	//}
-	POSITION tFirstDocTemplatePos = theApp.m_pDocManager->GetFirstDocTemplatePosition();
-	CDocTemplate* pBitmapViewDocTemplate = theApp.m_pDocManager->GetNextDocTemplate(tFirstDocTemplatePos);
-	pBitmapViewDocTemplate->OpenDocumentFile(NULL);
-}
+//void CMyRainmeterApp::OnFileNew()
+//{
+//	// TODO: 在此添加命令处理程序代码
+//	//for(POSITION tPos = theApp.m_pDocManager->GetFirstDocTemplatePosition();tPos!=NULL;)
+//	//{
+//	//	//get pointer to the CdocTemplates.
+//	//	CDocTemplate * ptempDocTemplate = 
+//	//		theApp.m_pDocManager->GetNextDocTemplate (tPos);
+//	//	//this will make the view visible.
+//	//	ptempDocTemplate->OpenDocumentFile(NULL);
+//	//}	
+//	POSITION tFirstDocTemplatePos = theApp.m_pDocManager->GetFirstDocTemplatePosition();
+//	CDocTemplate* pBitmapViewDocTemplate = theApp.m_pDocManager->GetNextDocTemplate(tFirstDocTemplatePos);
+//	pBitmapViewDocTemplate->OpenDocumentFile(NULL);
+//}
+
 
 
 //void CAboutDlg::OnPaint()
@@ -294,3 +374,10 @@ void CMyRainmeterApp::OnFileNew()
 //	// TODO: 在此处添加消息处理程序代码
 //	// 不为绘图消息调用 CDialogEx::OnPaint()
 //}
+
+
+
+
+
+
+

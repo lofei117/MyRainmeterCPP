@@ -26,6 +26,7 @@ private:
 	unordered_map<wstring, wstring> m_Variables;
 	unordered_map<wstring, CMeter*> m_Meters;
 	unordered_map<wstring, CMeansure*> m_Meansures;
+	
 //	CList<CMeter, CMeter&> m_Meters;
 //	CList<CMeansure, CMeansure&> m_Measures;
 	
@@ -45,14 +46,17 @@ public:
 	void SetVariable(std::wstring strVariable, const std::wstring& strValue);
 	void SetBuiltInVariables(std::wstring strVariable, const std::wstring& strValue);
 	// GetValue
-	CString GetValue(LPCTSTR section, LPCTSTR key, LPCTSTR defValue);
+	CString GetValue(LPCTSTR section, LPCTSTR key, LPCTSTR defValue=L"");
 	// Get value as string
-	CString GetValueString(LPCTSTR section, LPCTSTR key, LPCTSTR defValue);
+	CString GetValueString(LPCTSTR section, LPCTSTR key, LPCTSTR defValue=L"");	
 	
 	// Get value as integer
-	int ReadInt(LPCTSTR section, LPCTSTR key, int defValue);
+	int GetValueInt(LPCTSTR section, LPCTSTR key, int defValue=0);
 	uint32_t ReadUInt(LPCTSTR section, LPCTSTR key, uint32_t defValue);
 	uint64_t ReadUInt64(LPCTSTR section, LPCTSTR key, uint64_t defValue);
+
+	// Get value as float
+	float GetValueFloat(LPCTSTR section, LPCTSTR key, float defValue=0.0);
 
 	// Write value to config
 	void SetValueString(LPCTSTR section, LPCTSTR key, LPCTSTR value);
@@ -67,13 +71,11 @@ public:
 	unordered_map<std::wstring, CMeansure*> GetMeansureList();
 	CMeter* GetMeter(std::wstring meterName);
 	CString GetValue(CString section, CString key, CString defaultValue);
-	bool SetValue(CString section, CString key);
+	bool SetValue(CString section, CString key);	
 
 // private methods
 private:
-	static std::wstring StrToUpper(const std::wstring& str) { std::wstring strTmp(str); StrToUpperC(strTmp); return strTmp; }
-	static std::wstring StrToUpper(const WCHAR* str) { std::wstring strTmp(str); StrToUpperC(strTmp); return strTmp; }
-	static std::wstring& StrToUpperC(std::wstring& str) { _wcsupr(&str[0]); return str; }	
+	
 	void ReadVariables();
 	void ReadIniFile();
 	bool ReplaceVariables(std::wstring& result);

@@ -22,6 +22,7 @@ public:
 	void AddStrLogToOutputWnd(CString str);
 	CKitView* GetKitVew();
 	CPropertiesWnd* GetPropWnd();
+	CFileView* GetFileView();
 
 // ÖØÐ´
 public:

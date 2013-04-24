@@ -165,7 +165,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	lstBasicCommands.AddTail(ID_FILE_OPEN);
 	lstBasicCommands.AddTail(ID_FILE_NEW_CONFIG);
 	lstBasicCommands.AddTail(ID_FILE_NEW_SKIN);
+	lstBasicCommands.AddTail(ID_FILE_OPEN_CONFIG);
+	lstBasicCommands.AddTail(ID_FILE_OPEN_SKIN);
 	lstBasicCommands.AddTail(ID_FILE_SAVE);
+	lstBasicCommands.AddTail(ID_FILE_SAVE_AS);
 	lstBasicCommands.AddTail(ID_FILE_PRINT);
 	lstBasicCommands.AddTail(ID_APP_EXIT);
 	lstBasicCommands.AddTail(ID_EDIT_CUT);
@@ -185,6 +188,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	lstBasicCommands.AddTail(ID_SORTING_SORTBYTYPE);
 	lstBasicCommands.AddTail(ID_SORTING_SORTBYACCESS);
 	lstBasicCommands.AddTail(ID_SORTING_GROUPBYTYPE);
+	lstBasicCommands.AddTail(ID_OPEN_BUILTIN_GUI);
+	lstBasicCommands.AddTail(ID_OPEN_BUILTIN_TXT);
+	lstBasicCommands.AddTail(ID_OPEN_SYS);
+	lstBasicCommands.AddTail(ID_OPEN_NOTEPAD);
 
 	CMFCToolBar::SetBasicCommands(lstBasicCommands);
 
@@ -443,4 +450,9 @@ CKitView* CMainFrame::GetKitVew()
 CPropertiesWnd* CMainFrame::GetPropWnd()
 {
 	return &(this->m_wndProperties);
+}
+
+CFileView* CMainFrame::GetFileView()
+{
+	return &(this->m_wndFileView);
 }

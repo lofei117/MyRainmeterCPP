@@ -2,6 +2,7 @@
 #include "ConfigParser.h"
 #include <Windows.h>
 #include "ConstInfo.h"
+#include "RainmeterUtil.h"
 
 
 CConfigParser::CConfigParser(CString fileName)
@@ -83,7 +84,7 @@ bool CConfigParser::ReplaceVariables(std::wstring& result)
 */
 const std::wstring* CConfigParser::GetVariable(const std::wstring& strVariable)
 {
-	const std::wstring strTmp = StrToUpper(strVariable);
+	const std::wstring strTmp = CRainmeterUtil::StrToUpper(strVariable);
 
 	// #1: Built-in variables
 	std::unordered_map<std::wstring, std::wstring>::const_iterator iter = m_BuiltInVariables.find(strTmp);
@@ -239,7 +240,7 @@ unordered_map<wstring, wstring> CConfigParser::GetVariables()
 
 void CConfigParser::SetVariable( std::wstring strVariable, const std::wstring& strValue )
 {
-	StrToUpperC(strVariable);
+	CRainmeterUtil::StrToUpperC(strVariable);
 	m_Variables[strVariable] = strValue;
 }
 
@@ -259,7 +260,9 @@ CString CConfigParser::GetValueString(LPCTSTR section, LPCTSTR key, LPCTSTR defV
 	TCHAR strTmp[MAX_LINE_LENGTH];
 	DWORD nSize = MAX_LINE_LENGTH;
 	DWORD res = GetPrivateProfileString(section, key, defValue, strTmp, nSize, this->configFileName);
-	return strTmp;
+	wstring str = strTmp;
+	ReplaceVariables(str);
+	return str.c_str();
 }
 
 CString CConfigParser::GetValue(LPCTSTR section, LPCTSTR key, LPCTSTR defValue)
@@ -267,9 +270,9 @@ CString CConfigParser::GetValue(LPCTSTR section, LPCTSTR key, LPCTSTR defValue)
 	return GetValueString(section, key, defValue);
 }
 
-int CConfigParser::ReadInt( LPCTSTR section, LPCTSTR key, int defValue )
+int CConfigParser::GetValueInt( LPCTSTR section, LPCTSTR key, int defValue )
 {
-	const std::wstring& result = GetValueString(section, key, L"").GetBuffer();
+	const std::wstring& result = GetValueString(section, key).GetBuffer();
 	const WCHAR* string = result.c_str();
 	if (*string == L'(')
 	{
@@ -311,6 +314,18 @@ void CConfigParser::AddSection( LPCTSTR section )
 void CConfigParser::SetValueString( LPCTSTR section, LPCTSTR key, LPCTSTR value )
 {
 	WritePrivateProfileString(section, key, value, this->configFileName);
+}
+
+float CConfigParser::GetValueFloat( LPCTSTR section, LPCTSTR key, float defValue/*=0.0*/ )
+{
+	CString sTemp = GetValueString(section,key);
+	float ret;
+	if (sTemp.Trim().CompareNoCase(L"")==0)
+	{
+		return defValue;
+	}
+	_stscanf_s(sTemp, _T("%f"), &ret);
+	return ret;
 }
 
 

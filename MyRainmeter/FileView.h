@@ -31,6 +31,7 @@ protected:
 
 protected:
 	void FillFileView();
+	void TraverseDir(CString folderName, HTREEITEM hParent);
 
 // й╣ож
 public:
@@ -56,5 +57,7 @@ public:
 	afx_msg void OnOpenNotepad();
 	afx_msg void OnOpenBuiltinTxt();
 	afx_msg void OnOpenBuiltinGui();
+	afx_msg void OnRefresh();
+	
 };
 

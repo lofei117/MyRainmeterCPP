@@ -11,6 +11,7 @@ class CRmControl : public CObject
 
 public:
 	CRmControl(CXTPTaskPanelGroupItem *pItem, CMyRainmeterGraphView* pView);
+	
 	virtual ~CRmControl();
 
 	// Attributes
@@ -23,7 +24,7 @@ protected:
 	CMyRainmeterGraphView *m_pGraphView;
 
 	// Operations
-public:
+public:	
 	virtual void Draw(CDC* pDC, CXTPTaskPanel* taskPanel );
 	virtual void Draw(CDC* pDC, CXTPTaskPanel* taskPanel, CXTPTaskPanelGroupItem* pItem );
 	virtual void Remove();

@@ -20,6 +20,7 @@ CRmControl::CRmControl(CXTPTaskPanelGroupItem *pItem, CMyRainmeterGraphView* pVi
 	m_pDocument	 = pView->GetDocument();	
 }
 
+
 CRmControl::~CRmControl()
 {
 }

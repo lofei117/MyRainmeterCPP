@@ -77,7 +77,7 @@ CXTPTaskPanelGroup* CKitView::CreateToolboxGroup( UINT nID )
 {
 	CXTPTaskPanelGroup* pFolder = m_wndTaskPanel.AddGroup(nID);
 
-	CXTPTaskPanelGroupItem* pPointer = pFolder->AddLinkItem(ID_TOOLBOXITEM_POINTER, 0);
+	CXTPTaskPanelGroupItem* pPointer = pFolder->AddLinkItem(ID_TOOLBOXITEM_POINTER, 0);	
 	pPointer->SetItemSelected(TRUE);
 	pPointer->AllowDrag(FALSE);
 	pPointer->AllowDrop(FALSE);
@@ -91,26 +91,26 @@ void CKitView::ResetToolboxItems()
 	m_wndTaskPanel.GetGroups()->Clear(FALSE);
 
 	CXTPTaskPanelGroup* pMetersPane = CreateToolboxGroup(ID_TOOLBOXFOLDER_METERS);
-	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_BUTTON           ,1);
+	/*pMetersPane->AddLinkItem(ID_TOOLBOXITEM_BUTTON           ,1);
 	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_BITMAP			 ,2);
 	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_BAR				 ,3);
-	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_HISTOGRAM		 ,4);
-	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_IMAGE            ,5);
-	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_LINE			 ,6);
-	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_ROTATOR          ,7);
-	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_ROUNDLINE		 ,8);
-	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_STRING           ,9);
+	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_HISTOGRAM		 ,4);*/
+	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_IMAGE            ,10);
+	//pMetersPane->AddLinkItem(ID_TOOLBOXITEM_LINE			 ,6);
+	//pMetersPane->AddLinkItem(ID_TOOLBOXITEM_ROTATOR          ,7);
+	//pMetersPane->AddLinkItem(ID_TOOLBOXITEM_ROUNDLINE		 ,8);
+	pMetersPane->AddLinkItem(ID_TOOLBOXITEM_STRING           ,4);
 
 	CXTPTaskPanelGroup* pMeansuresPane = CreateToolboxGroup(ID_TOOLBOXFOLDER_MEANSURES);
-	pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_CALC           ,1);
-	pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_CPU			  ,2);
-	pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_DISKSPACE	  ,3);
-	pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_MEMORY		  ,4);
-	pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_NET            ,5);
-	pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_PLUGIN		  ,6);
-	pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_REGISTRY       ,7);
-	pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_TIME			  ,8);
-	pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_UPTIME         ,9);
+	//pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_CALC           ,1);
+	//pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_CPU			  ,2);
+	//pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_DISKSPACE	  ,3);
+	//pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_MEMORY		  ,4);
+	//pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_NET            ,5);
+	//pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_PLUGIN		  ,6);
+	//pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_REGISTRY       ,7);
+	//pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_TIME			  ,8);
+	//pMeansuresPane->AddLinkItem(ID_TOOLBOXITEM_UPTIME         ,9);
 
 	/*CXTPTaskPanelGroup* pFolderComponents = CreateToolboxGroup(ID_TOOLBOXFOLDER_COMPONENTS);
 	pFolderComponents->AddLinkItem(ID_TOOLBOXITEM_FILESYSTEMWATCHER     ,34);
@@ -207,30 +207,6 @@ void CKitView::OnUpdateSort(CCmdUI* pCmdUI)
 	pCmdUI->SetCheck(pCmdUI->m_nID == m_nCurrSort);
 }
 
-void CKitView::OnClassAddMemberFunction()
-{
-	AfxMessageBox(_T("添加成员函数..."));
-}
-
-void CKitView::OnClassAddMemberVariable()
-{
-	// TODO: 在此处添加命令处理程序代码
-}
-
-void CKitView::OnClassDefinition()
-{
-	// TODO: 在此处添加命令处理程序代码
-}
-
-void CKitView::OnClassProperties()
-{
-	// TODO: 在此处添加命令处理程序代码
-}
-
-void CKitView::OnNewFolder()
-{
-	AfxMessageBox(_T("新建文件夹..."));
-}
 
 void CKitView::OnPaint()
 {

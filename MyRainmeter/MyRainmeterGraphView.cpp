@@ -52,6 +52,9 @@ BEGIN_MESSAGE_MAP(CMyRainmeterGraphView, CScrollView)
 	ON_COMMAND(ID_VIEW_CODE, &CMyRainmeterGraphView::OnViewCode)
 	ON_WM_MOUSEMOVE()
 	ON_COMMAND(ID_EDIT_PROPERTIES, &CMyRainmeterGraphView::OnEditProperties)
+	ON_COMMAND(ID_EDIT_DELETE, &CMyRainmeterGraphView::OnEditDelete)
+	ON_COMMAND(ID_EDIT_MOVEDOWN, &CMyRainmeterGraphView::OnEditMoveDown)
+	ON_COMMAND(ID_EDIT_MOVEUP, &CMyRainmeterGraphView::OnEditMoveUp)
 END_MESSAGE_MAP()
 
 // CMyRainmeterGraphView ¹¹Ôì/Îö¹¹
@@ -103,6 +106,8 @@ void CMyRainmeterGraphView::OnDraw(CDC* pDC)
 	//CDC dc;
 	CDC* pDrawDC = pDC;
 
+	m_ToolTip.DelTool(this, 1);
+
 	// only paint the rect that needs repainting
 	CRect client;
 	pDC->GetClipBox(client);
@@ -113,9 +118,24 @@ void CMyRainmeterGraphView::OnDraw(CDC* pDC)
 	if (!pDC->IsPrinting())
 		DrawBackground(pDC);
 
-	pDoc->Draw(pDrawDC, GetTaskPanel());
+	//pDoc->Draw(pDrawDC, GetTaskPanel());
 
+	pDoc->m_Text="";
+	pDoc->m_Text+=pDoc->m_Rainmeter.ToString();
+	pDoc->m_Text+=pDoc->m_MeterData.ToString();
+	for (int i = 0; i < pDoc->m_arrItems.GetSize(); i++)
+	{
+		CRmControl* pRmCtrl = (CRmControl* )pDoc->m_arrItems[i];		
+		
+		pRmCtrl->Draw(pDC, GetTaskPanel());
 
+		CXTPTaskPanelGroupItem* pItem=pRmCtrl->m_pItem;
+
+		m_ToolTip.AddTool(this, pItem->GetCaption(), pItem->GetItemRect(), 1);
+
+		pDoc->m_Text += pRmCtrl->ToString();		
+	}
+	
 	CRect rcTrash(rect.right - 72, rect.bottom - 72, rect.right - 12, rect.bottom - 12);
 //	pDC->FillSolidRect(rcTrash, GetSysColor(COLOR_3DFACE));
 	pDC->Draw3dRect(rcTrash, GetSysColor(COLOR_3DHIGHLIGHT), GetSysColor(COLOR_3DSHADOW));
@@ -217,6 +237,16 @@ void CMyRainmeterGraphView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 
 void CMyRainmeterGraphView::OnRButtonUp(UINT /* nFlags */, CPoint point)
 {
+	CPoint relPoint = GetScrollPosition()+point;
+	int nHit = HitTest(relPoint);
+	if(nHit<0)
+	{
+		GetDocument()->m_pCurRmCtrl = NULL;
+	}
+	else
+	{
+		GetDocument()->m_pCurRmCtrl = GetDocument()->m_arrItems[nHit];
+	}
 	ClientToScreen(&point);
 	OnContextMenu(this, point);
 }
@@ -257,7 +287,7 @@ CMyRainmeterDoc* CMyRainmeterGraphView::GetDocument() const // ·Çµ÷ÊÔ°æ±¾ÊÇÄÚÁªµ
 void CMyRainmeterGraphView::OnViewCode()
 {
 	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌÐò´úÂë
-	GetDocument()->SwitchViewCodeFrame();	
+	GetDocument()->OpenTxtViewFrame();	
 }
 
 void CMyRainmeterGraphView::OnEditProperties()
@@ -303,7 +333,7 @@ void CMyRainmeterGraphView::OnMouseMove(UINT nFlags, CPoint point)
 
 BOOL CMyRainmeterGraphView::OnEraseBkgnd( CDC* pDC )
 {
-	//FillOutsideRect(pDC, &m_BrushBackGround);
+	//FillOutsideRect(pDC, &m_BrushBackGround);	
 	return TRUE;
 }
 
@@ -341,6 +371,7 @@ void CMyRainmeterGraphView::OnLButtonDown( UINT nFlags, CPoint point )
 		return;
 
 	m_bDragging = TRUE;
+	oldPosition = point;
 
 	DROPEFFECT dropEffect = ds.DoDragDrop(DROPEFFECT_COPY|DROPEFFECT_MOVE);
 
@@ -425,7 +456,9 @@ BOOL CMyRainmeterGraphView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropE
 	// TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
 	if (PtInTrash(point))
 	{
-		pDoc->Remove(GetDocument()->m_pCurRmCtrl);
+		CRmControl* pRmCtrl = pDoc->m_pCurRmCtrl;
+		pDoc->Remove(pRmCtrl);
+		pRmCtrl->InternalRelease();
 		pDoc->m_pCurRmCtrl = NULL;
 		pDoc->UpdateAllViews(this);
 		return TRUE;
@@ -437,19 +470,18 @@ BOOL CMyRainmeterGraphView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropE
 
 	ASSERT_KINDOF(CXTPTaskPanelGroupItem, pItemDrop);
 
-	CString itemCaption = pItemDrop->GetCaption();
-	
+	CString itemCaption = pItemDrop->GetCaption();	
 	
 	CPoint ScrollPos = this->GetScrollPosition();
-	CRect itemRect = CRect(point.x + ScrollPos.x - 16, point.y + ScrollPos.y - 16, point.x +ScrollPos.x + 16, point.y + ScrollPos.y + 16);
-	pItemDrop->SetItemRect(itemRect);
 	
-//	pItemDrop->SetTooltip(itemCaption);
-	m_ToolTip.AddTool(this, itemCaption, itemRect, 1);
+	CRect itemRect = CRect(point.x + ScrollPos.x - 16, point.y + ScrollPos.y - 16, point.x +ScrollPos.x + 16, point.y + ScrollPos.y + 16);
+	
 
 	CRmControl* pRmCtrl;
 	if (dropEffect == DROPEFFECT_COPY)
 	{	
+		pItemDrop->SetItemRect(itemRect);	
+
 		if (itemCaption.CompareNoCase(_T("Bar")) == 0)
 		{
 			pRmCtrl = new CMeterBar(pItemDrop);
@@ -457,14 +489,14 @@ BOOL CMyRainmeterGraphView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropE
 		else if (itemCaption.CompareNoCase(_T("Image")) == 0)
 		{
 			CMeterImage* pMeterImage = new CMeterImage(pItemDrop, this);
-			pMeterImage->SetMeterName(_T("Image1"));
+			pMeterImage->SetMeterName(pDoc->GeneralSectionName(itemCaption));
 			pRmCtrl = pMeterImage;
 			//pRmCtrl = new CMeterImage(pItemDrop, this);					
 		} 
 		else if (itemCaption.CompareNoCase(_T("String")) == 0)
 		{
 			CMeterString* pMeterString = new CMeterString(pItemDrop, this);
-			pMeterString->SetMeterName(_T("String1"));
+			pMeterString->SetMeterName(pDoc->GeneralSectionName(itemCaption));
 			pRmCtrl = pMeterString;
 		} 
 		else
@@ -477,6 +509,13 @@ BOOL CMyRainmeterGraphView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropE
 	else if (dropEffect == DROPEFFECT_MOVE)
 	{
 		pRmCtrl = pDoc->m_pCurRmCtrl;
+
+		CPoint dist = point - oldPosition;
+		CRect rcItem = pRmCtrl->m_pItem->GetItemRect();
+		itemRect = CRect(rcItem.TopLeft()+dist, rcItem.BottomRight()+dist);
+		//itemRect = CRect(point.x + ScrollPos.x - 16, point.y + ScrollPos.y - 16, point.x +ScrollPos.x + 16, point.y + ScrollPos.y + 16);
+		pItemDrop->SetItemRect(itemRect);	
+		
 		pRmCtrl->m_pItem = pItemDrop;
 		pRmCtrl->UpdateProperties();
 	}
@@ -484,7 +523,7 @@ BOOL CMyRainmeterGraphView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropE
 	{
 		return TRUE;
 	}
-		
+	
 	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
 	CPropertiesWnd* pPropWnd = pMainFrm->GetPropWnd();
 	pPropWnd->SetCurObjProperties(pRmCtrl);
@@ -549,3 +588,49 @@ BOOL CMyRainmeterGraphView::PreTranslateMessage(MSG* pMsg)
 
 
 
+
+
+void CMyRainmeterGraphView::OnEditDelete()
+{
+	CMyRainmeterDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌÐò´úÂë
+	int result = ::MessageBox(AfxGetMainWnd()->m_hWnd, _T("ÊÇ·ñÉ¾³ý£¿"), _T("É¾³ýMeter"), MB_YESNO);
+	if (result == IDYES)
+	{
+		CRmControl* pRmCtrl = pDoc->m_pCurRmCtrl;
+		pDoc->Remove(pRmCtrl);		
+		pRmCtrl->InternalRelease();
+		Invalidate(FALSE);
+	}	
+}
+
+
+
+
+void CMyRainmeterGraphView::OnEditMoveDown()
+{
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌÐò´úÂë
+	CMyRainmeterDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	CRmControl* pRmCtrl = pDoc->m_pCurRmCtrl;
+	pDoc->MoveDown(pRmCtrl);
+	//Invalidate(FALSE);
+	CRect rect = pRmCtrl->m_pItem->GetItemRect();
+	//InvalidateRect(&rect, FALSE);
+	Invalidate(FALSE);
+}
+
+
+void CMyRainmeterGraphView::OnEditMoveUp()
+{
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌÐò´úÂë
+	CMyRainmeterDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	CRmControl* pRmCtrl = pDoc->m_pCurRmCtrl;
+	pDoc->MoveUp(pDoc->m_pCurRmCtrl);
+	CRect rect = pRmCtrl->m_pItem->GetItemRect();
+	//InvalidateRect(&rect, FALSE);
+	Invalidate(FALSE);
+}

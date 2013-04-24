@@ -18,6 +18,21 @@ public:
 protected:
 };
 
+class CMyPropertyGridColor32Property : public CMFCPropertyGridColorProperty
+{
+public:
+	CMyPropertyGridColor32Property(const CString& strName,const COLORREF& color,CPalette* pPalette=NULL,LPCTSTR lpszDescr=NULL,DWORD_PTR dwData=0);
+	~CMyPropertyGridColor32Property();
+public:
+	virtual BOOL OnUpdateValue();
+	virtual void OnDrawValue(CDC* pDC, CRect rect);
+	virtual CString FormatProperty();
+	virtual BOOL OnEdit(LPPOINT lptClick);
+	virtual COleVariant GetValue();
+	//virtual void OnClickButton(CPoint point);
+
+
+};
 
 
 // 用于Action设置的 CActionDlg 对话框

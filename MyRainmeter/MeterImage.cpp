@@ -16,11 +16,11 @@
 
 CMeterImage::CMeterImage( CXTPTaskPanelGroupItem* pItem, CMyRainmeterGraphView* pView )
 {
-	m_ImageName = L"%1.png";
-	m_PreserveAspectRatio=0;
+	m_ImageName = L"rainmeter.png";
+	/*m_PreserveAspectRatio=L"0";
 	m_MeansureName=L"";
 	m_Path=L"";
-	m_ScaleMargins=L"";
+	m_ScaleMargins=L"";*/
 
 	m_pItem = pItem;
 	m_X = pItem->GetItemRect().left;
@@ -43,48 +43,166 @@ void CMeterImage::Serialize( CArchive& ar )
 
 void CMeterImage::Draw( CDC* pDC, CXTPTaskPanel* taskPanel )
 {
+	//__super::Draw(pDC, taskPanel);	
 	//taskPanel->GetPaintManager()->DrawGroupItemFrame(pDC, m_pItem, rcItem);	
-	
-	CImage image;
-	image.Load(m_ImageName);
-	if(image.IsNull())
+	Graphics graphics(pDC->m_hDC);		
+
+	// Draw SolidColor
+	COLORREF color = CRainmeterUtil::ParseColor2RGBA(m_SolidColor);
+	Color solidColor = Color(GetAValue(color), GetRValue(color), GetGValue(color), GetBValue(color));
+	Gdiplus::Rect solidRect(m_X, m_Y, m_W, m_H);
+	if (m_SolidColor2.Trim().GetLength()>0)
 	{
-		if(!CRainmeterUtil::LoadImageFromResource(&image, IDB_PNG_RAINMETER))
+		// SolidColor2
+		color = CRainmeterUtil::ParseColor2RGBA(m_SolidColor2);
+		Color solidColor2 = Color(GetAValue(color), GetRValue(color), GetGValue(color), GetBValue(color));
+		Gdiplus::LinearGradientBrush linGrBrush(solidRect,  //  绘制区域
+			solidColor,  //  第一种颜色
+			solidColor2,  //  第二种颜色 
+			(Gdiplus::REAL)m_GradientAngle);  //  渐变色的角度
+
+		graphics.FillRectangle(&linGrBrush, solidRect);
+	}
+	else
+	{
+		SolidBrush solidBrush(solidColor);
+		graphics.FillRectangle(&solidBrush, solidRect);
+	}
+
+	// Draw Image	
+	/*CFile file(m_ImageName, CFile::modeRead);
+	m_ImageName = file.GetFilePath();
+	file.Close();*/
+
+	CString imgPath = m_ImageName;
+	
+	if (PathIsRelative(imgPath))
+	{
+		CString sTemp = m_pDocument->GetPathName();
+		CFileFind ff;
+		ff.FindFile(sTemp);
+		ff.FindNextFile();
+		sTemp = ff.GetRoot();
+		ff.Close();		
+		PathCombine(sTemp.GetBuffer(MAX_FILENAME_LENGTH), sTemp, imgPath);
+		imgPath = sTemp;
+	}
+	//m_ImageName = L"C:\\Users\\lofei\\Desktop\\all\\蜂窝\\伸缩蜂窝\\bin1.png";
+
+	Gdiplus::Image* pImage = new Gdiplus::Image(imgPath);	
+	
+	if (pImage->GetLastStatus() != Gdiplus::Ok)
+	{		
+		if(!CRainmeterUtil::LoadImageFromResource(pImage, IDB_PNG_RAINMETER))
 		{
 			__super::Draw(pDC, taskPanel);			
-			image.Destroy();
 			return;
 		}
 	}
-	if(image)
+	
+	m_W = m_W==0?pImage->GetWidth():m_W;
+	m_H = m_H==0?pImage->GetHeight():m_H;
+	CRect rcItem = m_pItem->GetItemRect();	
+	/*int dX = (m_W-rcItem.Width())/2;
+	int dY = (m_H-rcItem.Height())/2;
+	rcItem.SetRect(rcItem.left-dX, rcItem.top-dY, rcItem.right+dX, rcItem.bottom+dY);*/
+	rcItem.SetRect(rcItem.left, rcItem.top, rcItem.left+m_W, rcItem.top+m_H);
+	m_pItem->SetItemRect(rcItem);
+	
+	RectF drawRect(rcItem.left, rcItem.top, m_W, m_H);	
+
+	// Image Flip
+	if (m_ImageFlip.Trim().CompareNoCase(_T("Horizontal")) == 0)
 	{
-		if (image.GetBPP() == 32) //确认该图像包含Alpha通道
-		{
-			int i;
-			int j;
-			for (i=0; i<image.GetWidth(); i++)
-			{
-				for (j=0; j<image.GetHeight(); j++)
-				{
-					byte *pByte = (byte *)image.GetPixelAddress(i, j);
-					pByte[0] = pByte[0] * pByte[3] / 255;
-					pByte[1] = pByte[1] * pByte[3] / 255;
-					pByte[2] = pByte[2] * pByte[3] / 255;
-				}
-			}
-		}
-		m_W = m_W==0?image.GetWidth():m_W;
-		m_H = m_H==0?image.GetHeight():m_H;
-		CRect rcItem = m_pItem->GetItemRect();	
-		int dX = (m_W-rcItem.Width())/2;
-		int dY = (m_H-rcItem.Height())/2;
-		rcItem.SetRect(rcItem.left-dX, rcItem.top-dY, rcItem.right+dX, rcItem.bottom+dY);
-		m_pItem->SetItemRect(rcItem);		
-		//CPoint ptIcon((rcItem.right + rcItem.left - image.GetWidth()) / 2, (rcItem.top + rcItem.bottom - image.GetHeight()) / 2);
-		//Image.BitBlt(pDC->m_hDC,ptIcon);
-		image.Draw(pDC->m_hDC, rcItem);		
+		pImage->RotateFlip(Rotate180FlipY);
 	}
-	image.Destroy();
+	else if (m_ImageFlip.Trim().CompareNoCase(_T("Vertical")) == 0)
+	{
+		pImage->RotateFlip(Rotate180FlipX);
+	}
+	else if (m_ImageFlip.Trim().CompareNoCase(_T("Both")) == 0)
+	{
+		//pImage->RotateFlip(Rotate180FlipXY);	// all right ,Rotate180FlipXY equals to RotateNoneFlipNone, I was cheated at first time.
+		pImage->RotateFlip(Rotate180FlipX);
+		pImage->RotateFlip(Rotate180FlipY);
+	}
+
+	// Tile, Rotate, ImageTint, ImageAlpha, and ImageCrop as well as ColorMatrixN  is under construction
+
+	// Greyscale the image
+	if (m_Greyscale.Trim().CompareNoCase(_T("1"))==0)
+	{	
+		ImageAttributes imageAttributes;
+		ColorMatrix colorMatrix ={
+			0.299f, 0.299f, 0.299f, 0, 0,
+			0.588f, 0.588f, 0.588f, 0, 0,
+			0.111f, 0.111f, 0.111f, 0, 0,
+			0, 0, 0, 1, 0 ,
+			0, 0, 0, 0, 1
+		};
+		imageAttributes.SetColorMatrix(
+			&colorMatrix, 
+			ColorMatrixFlagsDefault,
+			ColorAdjustTypeBitmap);		
+		graphics.DrawImage(
+			pImage, 
+			drawRect, 
+			0, 0, 
+			pImage->GetWidth(), 
+			pImage->GetHeight(), 
+			UnitPixel, 
+			&imageAttributes
+			);
+	}
+	else
+	{
+		graphics.DrawImage(pImage, drawRect);	
+	}	
+
+	// Release HDC
+	graphics.ReleaseHDC(pDC->m_hDC);
+		
+	delete pImage;
+	//CImage image;
+	//image.Load(m_ImageName);
+	//if(image.IsNull())
+	//{
+	//	if(!CRainmeterUtil::LoadImageFromResource(&image, IDB_PNG_RAINMETER))
+	//	{
+	//		__super::Draw(pDC, taskPanel);			
+	//		image.Destroy();
+	//		return;
+	//	}
+	//}
+	//if(image)
+	//{
+	//	if (image.GetBPP() == 32) //确认该图像包含Alpha通道
+	//	{
+	//		int i;
+	//		int j;
+	//		for (i=0; i<image.GetWidth(); i++)
+	//		{
+	//			for (j=0; j<image.GetHeight(); j++)
+	//			{
+	//				byte *pByte = (byte *)image.GetPixelAddress(i, j);
+	//				pByte[0] = pByte[0] * pByte[3] / 255;
+	//				pByte[1] = pByte[1] * pByte[3] / 255;
+	//				pByte[2] = pByte[2] * pByte[3] / 255;
+	//			}
+	//		}
+	//	}
+	//	m_W = m_W==0?image.GetWidth():m_W;
+	//	m_H = m_H==0?image.GetHeight():m_H;
+	//	CRect rcItem = m_pItem->GetItemRect();	
+	//	int dX = (m_W-rcItem.Width())/2;
+	//	int dY = (m_H-rcItem.Height())/2;
+	//	rcItem.SetRect(rcItem.left-dX, rcItem.top-dY, rcItem.right+dX, rcItem.bottom+dY);
+	//	m_pItem->SetItemRect(rcItem);		
+	//	//CPoint ptIcon((rcItem.right + rcItem.left - image.GetWidth()) / 2, (rcItem.top + rcItem.bottom - image.GetHeight()) / 2);
+	//	//Image.BitBlt(pDC->m_hDC,ptIcon);
+	//	image.Draw(pDC->m_hDC, rcItem);		
+	//}
+	//image.Destroy();
 }
 
 int CMeterImage::GetMeterType()
@@ -139,8 +257,17 @@ void CMeterImage::InitProperties( CMFCPropertyGridCtrl* pPropGridCtrl )
 	CMFCPropertyGridProperty* pAction = new CMyPropertyGridActionProterty(_T("OnUpdateAction"), m_OnUpdateAction, _T("Action to execute on each Update of the meter. This option obeys any UpdateDivider on the meter."));
 	pGeneralOptions->AddSubItem(pAction);
 	// SolidColor
-	pProp = new CMFCPropertyGridProperty(_T("SolidColor"), m_SolidColor, _T("Color of the meter background. If SolidColor2 is also specified, the background is a gradient composed of SolidColor and SolidColor2."));
-	pGeneralOptions->AddSubItem(pProp);
+	COLORREF color = CRainmeterUtil::ParseColor2RGBA(m_SolidColor);
+	CMyPropertyGridColor32Property* pColorProp= new CMyPropertyGridColor32Property(_T("SolidColor"), color, NULL, _T("Color of the meter background."));
+	pColorProp->EnableOtherButton(_T("其他..."));
+	pColorProp->EnableAutomaticButton(_T("默认"), ::GetSysColor(COLOR_3DFACE));
+	pGeneralOptions->AddSubItem(pColorProp);
+	// SolidColor2
+	color = CRainmeterUtil::ParseColor2RGBA(m_SolidColor2);
+	pColorProp = new CMyPropertyGridColor32Property(_T("SolidColor2"), color, NULL, _T("Color of the meter background. If SolidColor2 is also specified, the background is a gradient composed of SolidColor and SolidColor2."));
+	pColorProp->EnableOtherButton(_T("其他..."));
+	pColorProp->EnableAutomaticButton(_T("默认"), ::GetSysColor(COLOR_3DFACE));
+	pGeneralOptions->AddSubItem(pColorProp);
 	// GradientAngle
 	pProp = new CMFCPropertyGridProperty(_T("GradientAngle"), (_variant_t)m_GradientAngle, _T("Angle of the gradient in degrees (for SolidColor and SolidColor2)."));
 	pGeneralOptions->AddSubItem(pProp);
@@ -164,10 +291,11 @@ void CMeterImage::InitProperties( CMFCPropertyGridCtrl* pPropGridCtrl )
 	pProp->AllowEdit(FALSE);
 	pGeneralOptions->AddSubItem(pProp);
 	// TransformationMatrix
-	pProp = new CMFCPropertyGridProperty(_T("TransformationMatrix"), m_TransfromationMatrix, _T("Defines a 3x2 matrix which can be used to transform the meter."));
+	pProp = new CMFCPropertyGridProperty(_T("TransformationMatrix"), m_TransformationMatrix, _T("Defines a 3x2 matrix which can be used to transform the meter."));
 	pGeneralOptions->AddSubItem(pProp);
 
 	// Add options above here
+	pGeneralOptions->Expand(FALSE);
 	pPropGridCtrl->AddProperty(pGeneralOptions);		// Remember to add the options to the main grid control IN and ONLY IN the end
 	//**************** General Options Area End **************************//
 	
@@ -179,14 +307,20 @@ void CMeterImage::InitProperties( CMFCPropertyGridCtrl* pPropGridCtrl )
 	pProp = new CMFCPropertyGridProperty(_T("ImageCrop"), m_ImageCrop, _T("Crops the image. The value should be in the form: X, Y, W, H, Origin. Origin is optional and can be set to one of the following:	\n1: Top left. \n2: Top right.\n3: Bottom right.\n4: Bottom left.\n	5: Center (both W and H)."));
 	pImageOptions->AddSubItem(pProp); 
 	// Greyscale
-	pProp = new CMFCPropertyGridProperty(_T("Greyscale"), (_variant_t)m_DynamicVariables, _T("If set to 1, the image is greyscaled."));
+	pProp = new CMFCPropertyGridProperty(_T("Greyscale"), (_variant_t)m_Greyscale, _T("If set to 1, the image is greyscaled."));
 	pProp->AddOption(_T("0"));	
 	pProp->AddOption(_T("1"));	
 	pProp->AllowEdit(FALSE);
 	pImageOptions->AddSubItem(pProp);
 	// ImageTint
-	pProp = new CMFCPropertyGridProperty(_T("ImageTint"), m_ImageTint, _T("Color to tint the image with. "));
-	pImageOptions->AddSubItem(pProp); 
+	color = CRainmeterUtil::ParseColor2RGBA(m_ImageTint);
+    pColorProp= new CMyPropertyGridColor32Property(_T("ImageTint"), color, NULL, _T("Color to tint the image with."));
+	//pProp = new CMyPropertyGridColor32Property(_T("SolidColor"), m_SolidColor, _T("Color of the meter background. If SolidColor2 is also specified, the background is a gradient composed of SolidColor and SolidColor2."));
+	pColorProp->EnableOtherButton(_T("其他..."));
+	pColorProp->EnableAutomaticButton(_T("默认"), ::GetSysColor(COLOR_3DFACE));
+	pImageOptions->AddSubItem(pColorProp);
+	//pProp = new CMFCPropertyGridProperty(_T("ImageTint"), m_ImageTint, _T("Color to tint the image with. "));
+	//pImageOptions->AddSubItem(pProp); 
 	// ImageAlpha
 	pProp = new CMFCPropertyGridProperty(_T("ImageAlpha"), (_variant_t) m_ImageAlpha, _T("Opacity of the image ranging from 0 (invisible) to 255 (opaque). If set, overrides the alpha component specified in ImageTint."));
 	pProp->EnableSpinControl(TRUE, 0, 255);
@@ -196,7 +330,7 @@ void CMeterImage::InitProperties( CMFCPropertyGridCtrl* pPropGridCtrl )
 	pProp = new CMFCPropertyGridProperty(_T("ImageFlip"), m_ImageFlip, _T("Flips the image. Valid values are None, Horizontal, Vertical or Both."));
 	pProp->AddOption(_T("None"));	
 	pProp->AddOption(_T("Horizontal"));	
-	pProp->AddOption(_T("Vertical "));	
+	pProp->AddOption(_T("Vertical"));	
 	pProp->AddOption(_T("Both"));	
 	pProp->AllowEdit(FALSE);
 	pImageOptions->AddSubItem(pProp);
@@ -210,7 +344,7 @@ void CMeterImage::InitProperties( CMFCPropertyGridCtrl* pPropGridCtrl )
 	pProp->AllowEdit(FALSE);
 	pImageOptions->AddSubItem(pProp);
 	// ColorMatrix
-	pProp = new CMFCPropertyGridProperty(_T("ColorMatrix"), m_TransfromationMatrix, _T("Defines a 5x5 matrix used to manipulate the color values of the image."));
+	pProp = new CMFCPropertyGridProperty(_T("ColorMatrix"), m_ColorMatrix, _T("Defines a 5x5 matrix used to manipulate the color values of the image."));
 	pImageOptions->AddSubItem(pProp);
 		
 	// Add options above here
@@ -226,7 +360,7 @@ void CMeterImage::InitProperties( CMFCPropertyGridCtrl* pPropGridCtrl )
 	pMeterOptions->AddSubItem(pProp);
 	pProp = new CMyPropertyGridActionProterty(_T("Path"), m_Path , _T("Path of the image folder location."));
 	pMeterOptions->AddSubItem(pProp);
-	pProp = new CMFCPropertyGridProperty(_T("PreserveAspectRatio"), _T("0"), _T("Controls how W and H scale the image when Tile=0."));
+	pProp = new CMFCPropertyGridProperty(_T("PreserveAspectRatio"), m_PreserveAspectRatio, _T("Controls how W and H scale the image when Tile=0."));
 	pProp->AddOption(_T("0"));	
 	pProp->AddOption(_T("1"));	
 	pProp->AddOption(_T("2"));	
@@ -239,7 +373,18 @@ void CMeterImage::InitProperties( CMFCPropertyGridCtrl* pPropGridCtrl )
 	pPropGridCtrl->AddProperty(pMeterOptions);
 	//**************** Image Meter Options Area End **************************//
 
-
+	//**************** Mouse Actions Area Start **************************//
+	// Add options below here	
+	CMFCPropertyGridProperty* pMouseActions = new CMFCPropertyGridProperty(_T("鼠标事件"));
+	for (unordered_map<wstring,wstring>::iterator iter = m_MouseActions.begin(); iter!= m_MouseActions.end(); ++iter)
+	{
+		pAction = new CMyPropertyGridActionProterty(iter->first.c_str(), iter->second.c_str(), _T("Action to execute"));
+		pMouseActions->AddSubItem(pAction);		
+	}
+	pMouseActions->Expand(FALSE);
+	// Add options above here
+	pPropGridCtrl->AddProperty(pMouseActions);
+	//**************** Mouse Actions Options Area End **************************//
 }
 
 void CMeterImage::UpdateProperties()
@@ -252,10 +397,11 @@ void CMeterImage::PropertyChanged( CMFCPropertyGridProperty* pProp )
 {	
 	int i = (int) pProp->GetData ();
 	CString s = pProp->GetName();  //被改变的参数名
+	s = s.Trim();
 	COleVariant value = pProp->GetValue(); //改变之后的值	
 	
 	if (s.CompareNoCase(L"MeterName") == 0)
-	{
+	{		
 		m_MeterName = value.bstrVal;
 	} 
 	else if (s.CompareNoCase(L"MeansureName") == 0)
@@ -308,7 +454,13 @@ void CMeterImage::PropertyChanged( CMFCPropertyGridProperty* pProp )
 	}
 	else if (s.CompareNoCase(L"SolidColor") == 0)
 	{
+		value = ((CMyPropertyGridColor32Property*)pProp)->GetValue();
 		m_SolidColor = value.bstrVal;
+	}
+	else if (s.CompareNoCase(L"SolidColor2") == 0)
+	{
+		value = ((CMyPropertyGridColor32Property*)pProp)->GetValue();
+		m_SolidColor2 = value.bstrVal;
 	}
 	else if (s.CompareNoCase(L"GradientAngle") == 0)
 	{
@@ -328,7 +480,7 @@ void CMeterImage::PropertyChanged( CMFCPropertyGridProperty* pProp )
 	}
 	else if (s.CompareNoCase(L"TransformationMatrix") == 0)
 	{
-		m_TransfromationMatrix = value.bstrVal;
+		m_TransformationMatrix = value.bstrVal;
 	}
 	else if (s.CompareNoCase(L"ImageCrop") == 0)
 	{
@@ -340,6 +492,7 @@ void CMeterImage::PropertyChanged( CMFCPropertyGridProperty* pProp )
 	}
 	else if (s.CompareNoCase(L"ImageTint") == 0)
 	{
+		value = ((CMyPropertyGridColor32Property*)pProp)->GetValue();
 		m_ImageTint = value.bstrVal;
 	}
 	else if (s.CompareNoCase(L"ImageAlpha") == 0)
@@ -373,7 +526,7 @@ void CMeterImage::PropertyChanged( CMFCPropertyGridProperty* pProp )
 	}
 	else if (s.CompareNoCase(L"PreserveAspectRatio") == 0)
 	{
-		m_PreserveAspectRatio = value.intVal;
+		m_PreserveAspectRatio = value.bstrVal;
 	}
 	else if (s.CompareNoCase(L"ScaleMargins") == 0)
 	{
@@ -381,13 +534,21 @@ void CMeterImage::PropertyChanged( CMFCPropertyGridProperty* pProp )
 	}	 
 	else
 	{
+		CMFCPropertyGridProperty* pParent = pProp->GetParent();
+		CString tmp = pParent->GetName();
+		tmp = tmp.Trim();
+		if (tmp.CompareNoCase(_T("鼠标事件"))==0)
+		{
+			wstring action = s;
+			m_MouseActions[action]=value.bstrVal;
+		}
 	}
 	
 	//t = pProp->GetOriginalValue();  //改变之前的值
 	//CString d;
 	
 	//d = t.bstrVal;      //从COleVariant到CString
-	m_pItem->SetItemRect(CRect(m_X,m_Y,m_X+m_W,m_Y+m_H));
+	//m_pItem->SetItemRect(CRect(m_X,m_Y,m_X+m_W,m_Y+m_H));
 
 	//Invalidate();
 	
@@ -417,11 +578,12 @@ CString CMeterImage::ToString() const
 	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("UpdateDivider"), m_UpdateDivider, _T("")));
 	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("OnUpdateAction"), m_OnUpdateAction, _T("")));
 	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("SolidColor"), m_SolidColor, _T("")));
+	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("SolidColor2"), m_SolidColor2, _T("")));
 	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("GradientAngle"), m_GradientAngle));
 	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("BevelType"), m_BevelType));
 	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("AntiAlias"), m_AntiAlias));
 	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("DynamicVariables"), m_DynamicVariables));
-	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("TransfromationMatrix"), m_TransfromationMatrix));
+	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("TransformationMatrix"), m_TransformationMatrix));
 	// General Image Options
 	sTemp.Append(_T(";普通图片选项\r\n"));
 	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("Greyscale"), m_Greyscale));
@@ -439,9 +601,41 @@ CString CMeterImage::ToString() const
 	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("Path"), m_Path));
 	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("PreserveAspectRatio"), m_PreserveAspectRatio));
 	sTemp.Append(CRainmeterUtil::OrgKeyValuePair(_T("ScaleMargins"), m_ScaleMargins));	
+
+	// Mouse Actions
+	for (unordered_map<wstring,wstring>::const_iterator iter = m_MouseActions.begin(); iter!= m_MouseActions.end(); ++iter)
+	{
+		sTemp.Append(CRainmeterUtil::OrgKeyValuePair(iter->first.c_str(), iter->second.c_str()));
+	}
+
 	sTemp.Append(L"\r\n");
 	return sTemp;
 }
+
+void CMeterImage::ParseData( CConfigParser* pConfigParser )
+{
+	// Call CMeter::ParseData
+	__super::ParseData(pConfigParser);
+	
+	// Image Meter Options
+	m_ImageName = pConfigParser->GetValueString(m_MeterName, L"ImageName");
+	
+	//CFileFind fileFind;
+	//if(fileFind.FindFile(m_ImageName))
+	//{
+	//	fileFind.FindNextFile();		
+	//	m_ImageName = fileFind.GetFilePath();		
+	//}
+	//fileFind.Close();
+
+	m_Path = pConfigParser->GetValueString(m_MeterName, L"Path");
+	m_PreserveAspectRatio = pConfigParser->GetValueString(m_MeterName, L"PreserveAspectRatio");
+	m_ScaleMargins = pConfigParser->GetValueString(m_MeterName, L"ScaleMargins");
+
+	m_pItem->SetItemRect(CRect(m_X, m_Y, m_W, m_H));
+}
+
+
 
 
 

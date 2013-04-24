@@ -23,7 +23,7 @@ public:
 	CString m_MeansureName;
 	CString m_ImageName;
 	CString m_Path;
-	int m_PreserveAspectRatio;
+	CString m_PreserveAspectRatio;
 	CString m_ScaleMargins;
 
 public:
@@ -34,6 +34,7 @@ public:
 	virtual void PropertyChanged (CMFCPropertyGridProperty* pProp);
 	virtual CString ToString() const;
 	virtual void UpdateProperties();
+	virtual void ParseData(CConfigParser* pConfigParser);
 
 protected:
 

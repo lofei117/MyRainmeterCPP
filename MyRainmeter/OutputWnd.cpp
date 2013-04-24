@@ -62,17 +62,17 @@ int COutputWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	bNameValid = strTabName.LoadString(IDS_BUILD_TAB);
 	ASSERT(bNameValid);
 	m_wndTabs.AddTab(&m_wndOutputBuild, strTabName, (UINT)0);
-	bNameValid = strTabName.LoadString(IDS_DEBUG_TAB);
+	/*bNameValid = strTabName.LoadString(IDS_DEBUG_TAB);
 	ASSERT(bNameValid);
 	m_wndTabs.AddTab(&m_wndOutputDebug, strTabName, (UINT)1);
 	bNameValid = strTabName.LoadString(IDS_FIND_TAB);
 	ASSERT(bNameValid);
-	m_wndTabs.AddTab(&m_wndOutputFind, strTabName, (UINT)2);
+	m_wndTabs.AddTab(&m_wndOutputFind, strTabName, (UINT)2);*/
 
 	// 使用一些虚拟文本填写输出选项卡(无需复杂数据)
 	FillBuildWindow();
-	FillDebugWindow();
-	FillFindWindow();
+	//FillDebugWindow();
+	//FillFindWindow();
 
 	return 0;
 }
@@ -106,9 +106,9 @@ void COutputWnd::AdjustHorzScroll(CListBox& wndListBox)
  
 void COutputWnd::FillBuildWindow()
 {
-	m_wndOutputBuild.AddString(_T("生成输出正显示在此处。"));
-	m_wndOutputBuild.AddString(_T("输出正显示在列表视图的行中"));
-	m_wndOutputBuild.AddString(_T("但您可以根据需要更改其显示方式..."));
+	m_wndOutputBuild.AddString(_T("欢迎使用MyRainmeter"));
+	//m_wndOutputBuild.AddString(_T("输出正显示在列表视图的行中"));
+	//m_wndOutputBuild.AddString(_T("但您可以根据需要更改其显示方式..."));
 }
 
 void COutputWnd::FillDebugWindow()

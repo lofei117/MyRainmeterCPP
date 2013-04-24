@@ -31,6 +31,8 @@ private:
 	CToolTipCtrl m_ToolTip;			//tooltip 
 	CXTPImageManager m_imageManager;
 
+	CPoint oldPosition;
+
 // 操作
 public:
 	CMyRainmeterDoc* GetDocument() const;
@@ -89,6 +91,9 @@ public:
 	virtual BOOL OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnEditProperties();
+	afx_msg void OnEditDelete();	
+	afx_msg void OnEditMoveDown();
+	afx_msg void OnEditMoveUp();
 };
 
 #ifndef _DEBUG  // MyRainmeterGraphView.cpp 中的调试版本
